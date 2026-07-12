@@ -5,8 +5,10 @@
         <div class="flex gap-6 h-[179px]">
             <div class="card flex-1">
                 <div
-                    class="card-body border border-line-new bg-[linear-gradient(150.09deg,_rgba(255,255,255,0.02)_16.57%,_rgba(190,206,254,0.166828)_68.58%,_rgba(175,195,254,0.2)_83.44%)] rounded-[10px] flex flex-col items-center">
-                    <img src="{{ asset('img/PieLayer.png') }}" class="h-[127px] w-[192px] object-contain" alt="">
+                    class="card-body border border-line-new bg-[linear-gradient(150.09deg,_rgba(255,255,255,0.02)_16.57%,_rgba(190,206,254,0.166828)_68.58%,_rgba(175,195,254,0.2)_83.44%)] rounded-[10px] flex flex-col items-center gap-2">
+                    {{-- <img src="{{ asset('img/PieLayer.png') }}" class="h-[127px] w-[192px] object-contain" alt=""> --}}
+                    <div class="text-sm text-white/70">Total Portfolio</div>
+                    <div id="total-usdt" class="text-xl">Loading...</div>
                 </div>
             </div>
             <div class="card flex-1">
@@ -65,5 +67,31 @@
         </div>
     </div>
 
+    @push('scripts')
+        <script>
+            async function loadPortfolioTotal() {
+                try {
+                    const res = await fetch('/api/binance/dashboard');
+                    const data = await res.json();
 
+                    const totalEl = document.getElementById('total-usdt');
+
+                    if (data.error) {
+                        totalEl.textContent = 'Error';
+                        console.error('Portfolio error:', data.error);
+                        return;
+                    }
+
+                    totalEl.textContent = '$' + data.total_usdt.toLocaleString('en-US', {
+                        maximumFractionDigits: 2
+                    });
+                } catch (err) {
+                    document.getElementById('total-usdt').textContent = 'Gagal load';
+                    console.error('Fetch error:', err);
+                }
+            }
+
+            loadPortfolioTotal();
+        </script>
+    @endpush
 </x-layout.app>

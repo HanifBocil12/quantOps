@@ -35,6 +35,8 @@
         {{-- Side --}}
         <x-sidebar></x-sidebar>
     </div>
+
+    @stack('scripts')
 </body>
 
 </html>

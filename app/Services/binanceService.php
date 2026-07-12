@@ -20,9 +20,11 @@ class BinanceService
 
     public function getAccountBalance()
     {
+        $timestamp = $this->getBinanceTimestamp(); // ganti ini
+
         $params = [
-            'timestamp' => now()->getTimestampMs(),
-            'recvWindow' => 5000,
+            'timestamp' => $timestamp,
+            'recvWindow' => 60000,
         ];
         $params['signature'] = $this->sign($params);
 
@@ -31,6 +33,13 @@ class BinanceService
         ])->get("{$this->baseUrl}/api/v3/account", $params);
 
         return $response->json();
+    }
+
+    // tambahin method ini
+    private function getBinanceTimestamp(): int
+    {
+        $response = Http::get("{$this->baseUrl}/api/v3/time");
+        return $response->json()['serverTime'];
     }
 
     public function getAllPrices()
@@ -67,7 +76,7 @@ class BinanceService
                     'total' => (float) $b['free'] + (float) $b['locked'],
                 ];
             })
-            ->filter(fn ($b) => $b['total'] > 0) // buang koin kosong
+            ->filter(fn($b) => $b['total'] > 0) // buang koin kosong
             ->map(function ($b) use ($prices) {
                 $b['price_usdt'] = $this->resolvePrice($b['asset'], $prices);
                 $b['value_usdt'] = $b['total'] * $b['price_usdt'];
