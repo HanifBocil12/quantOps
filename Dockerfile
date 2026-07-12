@@ -1,17 +1,16 @@
-FROM richarvey/nginx-php-fpm:latest
+FROM tangramor/nginx-php8-fpm:php8.3.13_node22.11.0
 
-COPY . .
+COPY . /var/www/html
 
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+ENV WEBROOT="/var/www/html/public"
+ENV CREATE_LARAVEL_STORAGE="1"
 
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
-
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
-CMD ["/start.sh"]
+RUN apk add --no-cache --virtual .build-deps gcc g++ libc-dev make \
+    && cd /var/www/html \
+    && npm install \
+    && composer install --no-dev --optimize-autoloader \
+    && npm run build \
+    && apk del .build-deps \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && chown -Rf nginx.nginx /var/www/html
