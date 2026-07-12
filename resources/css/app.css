@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "daisyui";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,4 +7,127 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+         --color-unggugelap: #4C6FFF;
+    --color-ungguterang: #AFC3FE;
+    --color-15: #151515;
+    --color-05: #050505;
+    --color-33: #333333;
+    --color-line-new: #3C3C3C;
+    --color-65: #656565;
+
+    --spacing-xs: 9px;
+    --spacing-sm: 12px;     /* 9 × 1.33 ≈ 12 */
+    --spacing-md: 16px;     /* 12 × 1.33 ≈ 16 */
+    --spacing-lg: 21.33px;  /* 16 × 1.33 ≈ 21.3 */
+    --spacing-xl: 28.43px;  /* 21.3 × 1.33 ≈ 28.4 */
+    --spacing-2xl: 37.9px;  /* 28.4 × 1.33 ≈ 37.9 */
+
+    --radius-3xl: 50.52px; /* 37.9 × 1.33 ≈ 50.5 */
+    --radius-xs: 9px;
+    --radius-sm: 12px;     /* 9 × 1.33 ≈ 12 */
+    --radius-md: 16px;     /* 12 × 1.33 ≈ 16 */
+    --radius-lg: 21.33px;  /* 16 × 1.33 ≈ 21.3 */
+    --radius-xl: 28.43px;  /* 21.3 × 1.33 ≈ 28.4 */
+    --radius-2xl: 37.9px;  /* 28.4 × 1.33 ≈ 37.9 */
+    --radius-3xl: 50.52px; /* 37.9 × 1.33 ≈ 50.5 */
+
+     /* Text scale — angka sama persis, biar konsisten satu sistem */
+    --text-xs: 9px;
+    --text-sm: 12px;
+    --text-md: 16px;
+    --text-lg: 21.33px;
+    --text-xl: 28.43px;
+    --text-2xl: 37.9px;
+    --text-3xl: 50.52px;
+}
+
+@plugin 'daisyui/theme' {
+    name: "quantops";
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+   
+}
+
+.hero-gradient {
+  background: radial-gradient(circle 1500px at 50% 100%, #050505 60%, #4c6fff 77%, rgba(76, 111, 255, 0.35) 100%);
+}
+
+.btn-cus {
+    min-width: 100px;
+    font-size: 16px;
+    padding-block: 10px;    /* vertical */
+    padding-inline: 16px;   /* horizontal */
+    border-radius: 16px;     /* height total ≈ 36px, radius = 36/4.2 ≈ 8.5 */
+}
+
+.widget {
+   
+}
+
+.widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px; /* weight: 1 */
+    background: linear-gradient(150.09deg, #B0B0B0 0%, #3C3C3C 12%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.wi{
+
+}
+
+.wi::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(0deg, #3C3C3C 77%, #B0B0B0 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.f,ff{
+
+}
+
+.f::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(122deg, #3C3C3C 78%, #FFFFFF 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.ff::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(-127deg, #3C3C3C 74%, #FFFFFF 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.bg-li{
+    background: linear-gradient(170.09deg, rgba(255, 255, 255, 0.02) 16.57%, rgba(190, 206, 254, 0.166828) 68.58%, rgba(175, 195, 254, 0.2) 83.44%)
 }
