@@ -7,6 +7,7 @@ ENV CREATE_LARAVEL_STORAGE="1"
 
 RUN cd /var/www/html \
     && composer install --no-dev --optimize-autoloader \
-    && php artisan config:cache \
-    && php artisan route:cache \
+    && php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
     && chown -Rf nginx.nginx /var/www/html
