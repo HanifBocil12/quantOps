@@ -1,4 +1,4 @@
-FROM tangramor/nginx-php8-fpm:php8.3.13_node22.11.0
+FROM --platform=linux/amd64 tangramor/nginx-php8-fpm:php8.3.13_node22.11.0
 
 COPY . /var/www/html
 
