@@ -15,7 +15,13 @@ Route::get('/execution', [pageContoller::class, 'execution'])->name('execution')
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 
 
-Route::get('/debug/colo', function () {
-    $response = Http::get('https://binance-proxy.hanifbocil45.workers.dev/debug/colo');
-    return $response->json();
+Route::get('/debug/proxy', function () {
+    $response = \Illuminate\Support\Facades\Http::withOptions([
+        'proxy' => 'http://fdegllhw:rw80pg9ykfjr@64.137.96.74:6641',
+    ])->get('https://api.binance.com/api/v3/time');
+
+    return response()->json([
+        'status' => $response->status(),
+        'body'   => $response->json(),
+    ]);
 });
