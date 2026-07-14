@@ -3,7 +3,7 @@
 use App\Http\Controllers\BinanceController;
 use App\Http\Controllers\pageContoller;
 use Illuminate\Support\Facades\Route;
-use League\Uri\Http;
+use Illuminate\Support\Facades\Http;
 
 
 Route::get('/', [pageContoller::class, 'welcome'])->name('welcome');
