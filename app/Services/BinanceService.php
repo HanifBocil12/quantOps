@@ -10,17 +10,26 @@ class BinanceService
     protected string $apiKey;
     protected string $apiSecret;
     protected string $baseUrl;
+    protected string $proxy;
 
     public function __construct()
     {
         $this->apiKey = config('services.binance.key');
         $this->apiSecret = config('services.binance.secret');
         $this->baseUrl = config('services.binance.base_url');
+        $this->proxy = env('BINANCE_PROXY', '');
+    }
+
+    private function getHttpClient()
+    {
+        return Http::withOptions(array_filter([
+            'proxy' => $this->proxy ?: null,
+        ]));
     }
 
     public function getAccountBalance()
     {
-        $timestamp = $this->getBinanceTimestamp(); // ganti ini
+        $timestamp = $this->getBinanceTimestamp();
 
         $params = [
             'timestamp' => $timestamp,
@@ -28,21 +37,18 @@ class BinanceService
         ];
         $params['signature'] = $this->sign($params);
 
-        $response = Http::withHeaders([
-            'X-MBX-APIKEY' => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/v3/account", $params);
+        $response = $this->getHttpClient()
+            ->withHeaders(['X-MBX-APIKEY' => $this->apiKey])
+            ->get("{$this->baseUrl}/api/v3/account", $params);
 
         return $response->json();
     }
 
-    // tambahin method ini
     private function getBinanceTimestamp(): int
     {
-        $response = Http::get("{$this->baseUrl}/api/v3/time");
-
+        $response = $this->getHttpClient()->get("{$this->baseUrl}/api/v3/time");
         $json = $response->json();
 
-        // temporary debug — hapus setelah ketauan masalahnya
         if (!isset($json['serverTime'])) {
             throw new \Exception('Binance time failed: ' . json_encode($json));
         }
@@ -52,15 +58,10 @@ class BinanceService
 
     public function getAllPrices()
     {
-        // Semua harga sekaligus, dipake buat itung value tiap koin
-        $response = Http::get("{$this->baseUrl}/api/v3/ticker/price");
-
+        $response = $this->getHttpClient()->get("{$this->baseUrl}/api/v3/ticker/price");
         return collect($response->json())->pluck('price', 'symbol');
     }
 
-    /**
-     * Gabungin balance + harga jadi portfolio siap pakai
-     */
     public function getPortfolio(): array
     {
         $account = $this->getAccountBalance();
@@ -84,7 +85,7 @@ class BinanceService
                     'total' => (float) $b['free'] + (float) $b['locked'],
                 ];
             })
-            ->filter(fn($b) => $b['total'] > 0) // buang koin kosong
+            ->filter(fn($b) => $b['total'] > 0)
             ->map(function ($b) use ($prices) {
                 $b['price_usdt'] = $this->resolvePrice($b['asset'], $prices);
                 $b['value_usdt'] = $b['total'] * $b['price_usdt'];
@@ -102,11 +103,8 @@ class BinanceService
 
     private function resolvePrice(string $asset, $prices): float
     {
-        if ($asset === 'USDT') {
-            return 1.0;
-        }
+        if ($asset === 'USDT') return 1.0;
 
-        // coba ASSETUSDT dulu, kalo gaada coba ASSETBUSD/ASSETBTC*harga BTC
         if (isset($prices[$asset . 'USDT'])) {
             return (float) $prices[$asset . 'USDT'];
         }
