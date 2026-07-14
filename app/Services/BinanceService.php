@@ -39,7 +39,20 @@ class BinanceService
     private function getBinanceTimestamp(): int
     {
         $response = Http::get("{$this->baseUrl}/api/v3/time");
-        return $response->json()['serverTime'];
+
+        // log response mentah
+        \Log::info('Binance time response', [
+            'status' => $response->status(),
+            'body'   => $response->body(),
+        ]);
+
+        $json = $response->json();
+
+        if (!isset($json['serverTime'])) {
+            return (int) round(microtime(true) * 1000);
+        }
+
+        return (int) $json['serverTime'];
     }
 
     public function getAllPrices()
