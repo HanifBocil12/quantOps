@@ -8,6 +8,6 @@ Route::prefix('binance')->group(function () {
     Route::get('/dashboard', [BinanceController::class, 'portfolio']);
 });
 
-Route::prefix('news')->group(function(){
+Route::prefix('news')->group(function () {
     Route::get('/news', [news::class, 'getNews']);
 });
