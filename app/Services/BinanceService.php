@@ -40,16 +40,11 @@ class BinanceService
     {
         $response = Http::get("{$this->baseUrl}/api/v3/time");
 
-        // log response mentah
-        \Log::info('Binance time response', [
-            'status' => $response->status(),
-            'body'   => $response->body(),
-        ]);
-
         $json = $response->json();
 
+        // temporary debug — hapus setelah ketauan masalahnya
         if (!isset($json['serverTime'])) {
-            return (int) round(microtime(true) * 1000);
+            throw new \Exception('Binance time failed: ' . json_encode($json));
         }
 
         return (int) $json['serverTime'];
