@@ -6,6 +6,10 @@ ENV WEBROOT="/var/www/html/public"
 ENV CREATE_LARAVEL_STORAGE="1"
 
 RUN cd /var/www/html \
+    && npm install \
+    && npm run build
+
+RUN cd /var/www/html \
     && composer install --no-dev --optimize-autoloader \
     && php artisan config:clear \
     && php artisan route:clear \
