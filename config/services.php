@@ -28,5 +28,4 @@ return [
         'secret' => env('BINANCE_API_SECRET'),
         'base_url' => env('BINANCE_BASE_URL', 'https://api.binance.com'),
     ],
-
 ];

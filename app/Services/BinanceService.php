@@ -62,6 +62,28 @@ class BinanceService
         return collect($response->json())->pluck('price', 'symbol');
     }
 
+    public function getMarketList(): array
+    {
+        $response = $this->getHttpClient()
+            ->get("{$this->baseUrl}/api/v3/ticker/24hr");
+
+        return collect($response->json())
+            ->filter(fn($t) => str_ends_with($t['symbol'], 'USDT'))
+            ->map(fn($t) => [
+                'symbol'       => str_replace('USDT', '', $t['symbol']),
+                'pair'         => $t['symbol'],
+                'price'        => (float) $t['lastPrice'],
+                'change_pct'   => (float) $t['priceChangePercent'],
+                'volume_usdt'  => (float) $t['quoteVolume'],
+                'high'         => (float) $t['highPrice'],
+                'low'          => (float) $t['lowPrice'],
+            ])
+            ->filter(fn($m) => $m['price'] > 0 && $m['volume_usdt'] > 0)
+            ->sortByDesc('volume_usdt')
+            ->values()
+            ->toArray();
+    }
+
     public function getPortfolio(): array
     {
         $account = $this->getAccountBalance();

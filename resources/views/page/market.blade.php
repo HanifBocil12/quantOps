@@ -1,8 +1,11 @@
 <x-layout.app>
     <x-nav title="Market"></x-nav>
     <div class="flex flex-col gap-2 w-[1175px]">
+
+        {{-- 4 Cards Atas --}}
         <div class="flex gap-4 h-[174px]">
-            {{-- Populer --}}
+
+            {{-- Populer (volume tertinggi) --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -12,41 +15,27 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-[10px] font-bold">
-                                    B</div>
-                                <span class="text-sm">BNB</span>
+                        @foreach (collect($markets)->sortByDesc('volume_usdt')->take(3) as $coin)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">
+                                        {{ substr($coin['symbol'], 0, 1) }}
+                                    </div>
+                                    <span class="text-sm">{{ $coin['symbol'] }}</span>
+                                </div>
+                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <span
+                                    class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                                    {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
+                                </span>
                             </div>
-                            <span class="text-sm">Rp10.39M</span>
-                            <span class="text-sm text-red-500">-2.01%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">
-                                    B</div>
-                                <span class="text-sm">BTC</span>
-                            </div>
-                            <span class="text-sm">Rp1.12B</span>
-                            <span class="text-sm text-red-500">-1.90%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">
-                                    E</div>
-                                <span class="text-sm">ETH</span>
-                            </div>
-                            <span class="text-sm">Rp29.93M</span>
-                            <span class="text-sm text-red-500">-3.72%</span>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
-            {{-- Baru --}}
+            {{-- Baru (change terbaru — pakai yang change_pct kecil sebagai proxy "baru listing") --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -56,41 +45,27 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center text-[10px] font-bold">
-                                    A</div>
-                                <span class="text-sm">AMDB</span>
+                        @foreach (collect($markets)->sortBy('volume_usdt')->take(3) as $coin)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-sky-500 flex items-center justify-center text-[10px] font-bold">
+                                        {{ substr($coin['symbol'], 0, 1) }}
+                                    </div>
+                                    <span class="text-sm">{{ $coin['symbol'] }}</span>
+                                </div>
+                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <span
+                                    class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                                    {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
+                                </span>
                             </div>
-                            <span class="text-sm">Rp9.42M</span>
-                            <span class="text-sm text-green-500">+0.75%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-sky-500 flex items-center justify-center text-[10px] font-bold">
-                                    E</div>
-                                <span class="text-sm">EWYB</span>
-                            </div>
-                            <span class="text-sm">Rp3.58M</span>
-                            <span class="text-sm text-green-500">+2.10%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">
-                                    I</div>
-                                <span class="text-sm">INTCB</span>
-                            </div>
-                            <span class="text-sm">Rp2.42M</span>
-                            <span class="text-sm text-green-500">+4.12%</span>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
-            {{-- Tertinggi --}}
+            {{-- Tertinggi (change_pct terbesar) --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -100,36 +75,21 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-[10px] font-bold">
-                                    H</div>
-                                <span class="text-sm">HEI</span>
+                        @foreach (collect($markets)->sortByDesc('change_pct')->take(3) as $coin)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-[10px] font-bold">
+                                        {{ substr($coin['symbol'], 0, 1) }}
+                                    </div>
+                                    <span class="text-sm">{{ $coin['symbol'] }}</span>
+                                </div>
+                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <span class="text-sm text-green-500">
+                                    +{{ number_format($coin['change_pct'], 2) }}%
+                                </span>
                             </div>
-                            <span class="text-sm">Rp2.53K</span>
-                            <span class="text-sm text-green-500">+69.75%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center text-[10px] font-bold">
-                                    D</div>
-                                <span class="text-sm">DYDX</span>
-                            </div>
-                            <span class="text-sm">Rp2.74K</span>
-                            <span class="text-sm text-green-500">+16.58%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-orange-400 flex items-center justify-center text-[10px] font-bold">
-                                    G</div>
-                                <span class="text-sm">G</span>
-                            </div>
-                            <span class="text-sm">Rp53.40</span>
-                            <span class="text-sm text-green-500">+12.88%</span>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -144,49 +104,36 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">
-                                    B</div>
-                                <span class="text-sm">BTC</span>
+                        @foreach (collect($markets)->sortByDesc('volume_usdt')->take(3) as $coin)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">
+                                        {{ substr($coin['symbol'], 0, 1) }}
+                                    </div>
+                                    <span class="text-sm">{{ $coin['symbol'] }}</span>
+                                </div>
+                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <span
+                                    class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                                    {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
+                                </span>
                             </div>
-                            <span class="text-sm">Rp1.12B</span>
-                            <span class="text-sm text-red-500">-1.90%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">
-                                    E</div>
-                                <span class="text-sm">ETH</span>
-                            </div>
-                            <span class="text-sm">Rp29.93M</span>
-                            <span class="text-sm text-red-500">-3.72%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center text-[10px] font-bold">
-                                    S</div>
-                                <span class="text-sm">SOL</span>
-                            </div>
-                            <span class="text-sm">Rp1.25M</span>
-                            <span class="text-sm text-red-500">-2.74%</span>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
+
         </div>
 
+        {{-- Tab Filter --}}
         <div class="flex justify-between mt-6">
             <div class="flex gap-2">
-                <div class="">favorite</div>
-                <div class="">spot</div>
-                <div class="">future</div>
-                <div class="">new</div>
+                <div>favorite</div>
+                <div>spot</div>
+                <div>future</div>
+                <div>new</div>
             </div>
-            <div class=""></div>
         </div>
 
         <div class="flex items-center gap-2 text-md">
@@ -208,9 +155,10 @@
             <div class="text-md">Token Teratas berdasarkan Kapitalisasi Pasar</div>
             <div class="text-sm text-white/70">Dapatkan snapshot komprehensif dari semua mata uang kripto yang tersedia
                 di Binance. Halaman ini menampilkan harga terkini, volume perdagangan 24 jam, perubahan harga, dan
-                kapitalisasi pasar untuk semua </div>
+                kapitalisasi pasar untuk semua</div>
         </div>
 
+        {{-- Tabel Dynamic --}}
         <table class="table">
             <thead>
                 <tr class="text-end">
@@ -223,114 +171,39 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="text-end">
-                    <td class="text-start">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-sm font-bold">
-                                B</div>
-                            <div>
-                                <span class="font-bold">BTC</span>
-                                <span class="text-white/50">Bitcoin</span>
+                @foreach ($markets as $coin)
+                    <tr class="text-end hover:bg-white/5 transition">
+                        <td class="text-start">
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold">
+                                    {{ substr($coin['symbol'], 0, 1) }}
+                                </div>
+                                <div>
+                                    <span class="font-bold">{{ $coin['symbol'] }}</span>
+                                    <span class="text-white/50 text-sm ml-1">{{ $coin['pair'] }}</span>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="font-bold">63,015.52</div>
-                        <div class="text-sm text-white/50">Rp1,129,308,695.78</div>
-                    </td>
-                    <td class="text-red-500">-1.90%</td>
-                    <td>Rp531.87T</td>
-                    <td>Rp22,623.76T</td>
-                    <td>
-                        <div class="flex items-center justify-end gap-3">
-                            <button><i class="ph ph-chart-bar"></i></button>
-                            <button><i class="ph ph-star"></i></button>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr class="text-end">
-                    <td class="text-start">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold">
-                                E</div>
-                            <div>
-                                <span class="font-bold">ETH</span>
-                                <span class="text-white/50">Ethereum</span>
+                        </td>
+                        <td>
+                            <div class="font-bold">{{ \App\Http\Controllers\BinanceController::formatPrice($coin['price']) }}</div>
+                            <div class="text-sm text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                        </td>
+                        <td class="{{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                            {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
+                        </td>
+                        <td>Rp{{ number_format($coin['volume_usdt'] * 16000, 0, ',', '.') }}</td>
+                        <td>-</td>
+                        <td>
+                            <div class="flex items-center justify-end gap-3">
+                                <button><i class="ph ph-chart-bar"></i></button>
+                                <button><i class="ph ph-star"></i></button>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="font-bold">1,670.48</div>
-                        <div class="text-sm text-white/50">Rp29,936,872.54</div>
-                    </td>
-                    <td class="text-red-500">-3.72%</td>
-                    <td>Rp179.36T</td>
-                    <td>Rp3,614.06T</td>
-                    <td>
-                        <div class="flex items-center justify-end gap-3">
-                            <button><i class="ph ph-chart-bar"></i></button>
-                            <button><i class="ph ph-star"></i></button>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr class="text-end">
-                    <td class="text-start">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-sm font-bold">
-                                U</div>
-                            <div>
-                                <span class="font-bold">USDT</span>
-                                <span class="text-white/50">USDT</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="font-bold">1.00</div>
-                        <div class="text-sm text-white/50">Rp17,921.12</div>
-                    </td>
-                    <td class="text-red-500">-0.02%</td>
-                    <td>Rp1,097.14T</td>
-                    <td>Rp3,335.09T</td>
-                    <td>
-                        <div class="flex items-center justify-end gap-3">
-                            <button><i class="ph ph-chart-bar"></i></button>
-                            <button><i class="ph ph-star"></i></button>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr class="text-end">
-                    <td class="text-start">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-sm font-bold">
-                                B</div>
-                            <div>
-                                <span class="font-bold">BNB</span>
-                                <span class="text-white/50">Build and Build</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="font-bold">580.08</div>
-                        <div class="text-sm text-white/50">Rp10,395,683.29</div>
-                    </td>
-                    <td class="text-red-500">-2.01%</td>
-                    <td>Rp17.23T</td>
-                    <td>Rp1,401.47T</td>
-                    <td>
-                        <div class="flex items-center justify-end gap-3">
-                            <button><i class="ph ph-chart-bar"></i></button>
-                            <button><i class="ph ph-star"></i></button>
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
+
     </div>
 </x-layout.app>
