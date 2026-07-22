@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Log;
 class NewsService
 {
     protected array $rssFeeds = [
-        // kosong dulu — isi kalau nanti mau tambah RSS resmi (CoinDesk, dll)
-        // format: 'NamaSource' => 'https://url-rss-lengkap.com/feed', m
+       
     ];
 
     public function getNews(int $limit = 20): array
