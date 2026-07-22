@@ -6,6 +6,7 @@ ENV WEBROOT="/var/www/html/public"
 ENV CREATE_LARAVEL_STORAGE="1"
 
 RUN cd /var/www/html \
+    && rm -rf node_modules package-lock.json \
     && npm install \
     && npm run build
 
