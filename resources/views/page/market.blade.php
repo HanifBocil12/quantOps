@@ -36,7 +36,8 @@
                                             {{ number_format($coin['price'], 8) }}
                                         @endif
                                     </div>
-                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}
+                                    </div>
                                 </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
@@ -79,7 +80,8 @@
                                             {{ number_format($coin['price'], 8) }}
                                         @endif
                                     </div>
-                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}
+                                    </div>
                                 </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
@@ -122,7 +124,8 @@
                                             {{ number_format($coin['price'], 8) }}
                                         @endif
                                     </div>
-                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}
+                                    </div>
                                 </div>
                                 <span class="text-sm text-green-500">
                                     +{{ number_format($coin['change_pct'], 2) }}%
@@ -164,7 +167,8 @@
                                             {{ number_format($coin['price'], 8) }}
                                         @endif
                                     </div>
-                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}
+                                    </div>
                                 </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
@@ -258,7 +262,9 @@
                         <td>-</td>
                         <td>
                             <div class="flex items-center justify-end gap-3">
-                                <button><i class="ph ph-chart-bar"></i></button>
+                                <a href="{{ route('trade', ['pair' => $coin['pair']]) }}">
+                                    <i class="ph ph-chart-bar"></i>
+                                </a>
                                 <button><i class="ph ph-star"></i></button>
                             </div>
                         </td>

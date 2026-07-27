@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('telegram:fetch-news')
-    ->everyFiveMinutes()
+    ->everyTwoMinutes()
     ->withoutOverlapping();
