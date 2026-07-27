@@ -1,5 +1,5 @@
 <x-layout.app>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 w-[1175px]">
 
         {{-- Top Bar: Symbol Info --}}
         <div class="flex items-center gap-6 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] px-4 py-3 text-sm">
