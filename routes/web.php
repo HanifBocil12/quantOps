@@ -13,3 +13,4 @@ Route::get('/market', [pageContoller::class, 'market'])->name('market');
 Route::get('/model', [pageContoller::class, 'model'])->name('model');
 Route::get('/execution', [pageContoller::class, 'execution'])->name('execution');
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
+Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');

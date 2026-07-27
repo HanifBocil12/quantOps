@@ -55,4 +55,8 @@ class pageContoller extends Controller
     {
         return view('welcome');
     }
+    public function trade()
+    {
+        return view('page.trade', compact('pair'));
+    }
 }
