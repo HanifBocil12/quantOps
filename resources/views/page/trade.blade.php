@@ -37,22 +37,22 @@
 
             <div>
                 <div class="text-white/50 text-xs">High 24Jam</div>
-                <div>{{ $coin['highPrice'] }}</div>
+                <div>{{ $coin['high'] }}</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Low 24Jam</div>
-                <div>{{ $coin['lowPrice'] }}</div>
+                <div>{{ $coin['low'] }}</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Vol. 24 Jam(BTC)</div>
-                <div>{{ $coin['lowPrice'] }}</div>
+                <div>{{ number_format($coin['volume'], 2) }}</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Vol. 24 Jam(USDT)</div>
-                <div>{{ $coin['quoteVolume'] }}</div>
+                <div>{{ $coin['volume_usdt'] }}</div>
             </div>
         </div>
 
