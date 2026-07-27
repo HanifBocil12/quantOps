@@ -10,19 +10,19 @@
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">B
                 </div>
                 <div>
-                    <div class="font-bold">BTCUSDT <span class="text-white/40 font-normal">Perp</span></div>
+                    <div class="font-bold">{{ $coin['symbol'] }} <span class="text-white/40 font-normal">Perp</span></div>
                 </div>
                 <i class="ph ph-caret-down text-white/40"></i>
             </div>
 
             <div>
-                <div class="text-lg font-bold text-green-500">65.033,2</div>
-                <div class="text-xs text-white/50">512,6 +0,79%</div>
+                <div class="text-lg font-bold text-green-500">{{ $coin['price'] }}</div>
+                <div class="text-xs text-white/50">512,6 {{ $coin['change_pct'] }}%</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Mark</div>
-                <div>65.031,2</div>
+                <div>{{ $coin['pair'] }}</div>
             </div>
 
             <div>

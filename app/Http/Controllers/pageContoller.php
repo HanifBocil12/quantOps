@@ -57,6 +57,13 @@ class pageContoller extends Controller
     }
     public function trade(string $pair)
     {
-        return view('page.trade', compact('pair'));
+        $markets = $this->binance->getMarketList();
+        $coin = collect($markets)
+            ->firstWhere('pair', $pair);
+
+        return view('page.trade', [
+            'pair' => $pair,
+            'coin' => $coin,
+        ]);
     }
 }
