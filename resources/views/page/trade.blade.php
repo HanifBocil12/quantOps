@@ -52,7 +52,7 @@
 
             <div>
                 <div class="text-white/50 text-xs">Vol. 24 Jam(USDT)</div>
-                <div>5.936.622.018,55</div>
+                <div>{{ $coin['quoteVolume'] }}</div>
             </div>
         </div>
 
