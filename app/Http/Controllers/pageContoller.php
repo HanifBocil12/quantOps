@@ -22,10 +22,17 @@ class pageContoller extends Controller
     {
         return view('page.execution');
     }
-    public function market()
+    public function market(BinanceService $binance)
     {
-        $markets = $this->binance->getMarketList();
-        return view('page.market', compact('markets'));
+        $markets = $binance->getMarketList();
+
+        return view('page.market', [
+            'markets'       => $markets,
+            'populer'       => $binance->getPopular(),
+            // 'baru'          => $binance->getBaru(),
+            'tertinggi'     => $binance->getTertinggi(),
+            'volumeTeratas' => $binance->getVolumeTeratas(),
+        ]);
     }
 
     public function model()
