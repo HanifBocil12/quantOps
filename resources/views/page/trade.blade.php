@@ -47,7 +47,7 @@
 
             <div>
                 <div class="text-white/50 text-xs">Vol. 24 Jam(BTC)</div>
-                <div>{{ number_format($coin['volume'], 2) }}</div>
+                <div>{{ number_format($coin['volume_usdt'], 2) }}</div>
             </div>
 
             <div>
