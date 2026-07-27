@@ -15,7 +15,7 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        @foreach (collect($markets)->sortByDesc('volume_usdt')->take(3) as $coin)
+                        @foreach ($populer as $coin)
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <div
@@ -35,7 +35,7 @@
                 </div>
             </div>
 
-            {{-- Baru (change terbaru — pakai yang change_pct kecil sebagai proxy "baru listing") --}}
+            {{-- Baru — TETAP pakai collect($markets), belum ada Service method --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            {{-- Tertinggi (change_pct terbesar) --}}
+            {{-- Tertinggi --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -75,7 +75,7 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        @foreach (collect($markets)->sortByDesc('change_pct')->take(3) as $coin)
+                        @foreach ($tertinggi as $coin)
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <div
@@ -104,7 +104,7 @@
                                 class="ph ph-caret-right"></i></div>
                     </div>
                     <div class="flex flex-col gap-3">
-                        @foreach (collect($markets)->sortByDesc('volume_usdt')->take(3) as $coin)
+                        @foreach ($volumeTeratas as $coin)
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <div
@@ -186,7 +186,8 @@
                             </div>
                         </td>
                         <td>
-                            <div class="font-bold">{{ \App\Http\Controllers\BinanceController::formatPrice($coin['price']) }}</div>
+                            <div class="font-bold">
+                                {{ \App\Http\Controllers\BinanceController::formatPrice($coin['price']) }}</div>
                             <div class="text-sm text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
                         </td>
                         <td class="{{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
