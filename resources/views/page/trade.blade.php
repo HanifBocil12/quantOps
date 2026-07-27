@@ -1,11 +1,14 @@
 <x-layout.app>
+    <x-nav title="Market"></x-nav>
     <div class="flex flex-col gap-2 w-[1175px]">
 
         {{-- Top Bar: Symbol Info --}}
-        <div class="flex items-center gap-6 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] px-4 py-3 text-sm">
+        <div
+            class="flex items-center gap-6 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] px-4 py-3 text-sm">
             <div class="flex items-center gap-2">
                 <i class="ph ph-star text-white/40"></i>
-                <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">B</div>
+                <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">B
+                </div>
                 <div>
                     <div class="font-bold">BTCUSDT <span class="text-white/40 font-normal">Perp</span></div>
                 </div>
@@ -63,7 +66,8 @@
 
             {{-- Order Book + Trades --}}
             <div class="col-span-2 flex flex-col gap-2">
-                <div class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 h-[350px] overflow-hidden">
+                <div
+                    class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 h-[350px] overflow-hidden">
                     <div class="text-sm font-semibold mb-2">Order Book</div>
                     <div class="flex justify-between text-xs text-white/50 mb-1">
                         <span>Harga (USDT)</span>
@@ -92,7 +96,8 @@
                     </div>
                 </div>
 
-                <div class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 flex-1 overflow-hidden">
+                <div
+                    class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 flex-1 overflow-hidden">
                     <div class="flex gap-4 text-sm mb-2">
                         <span class="font-semibold border-b-2 border-blue-500 pb-1">Perdagangan</span>
                         <span class="text-white/50">Top Mover</span>
@@ -104,7 +109,8 @@
                     </div>
                     <div class="flex flex-col gap-[2px] text-xs">
                         @foreach ($trades ?? [] as $trade)
-                            <div class="flex justify-between {{ $trade['side'] === 'sell' ? 'text-red-500' : 'text-green-500' }}">
+                            <div
+                                class="flex justify-between {{ $trade['side'] === 'sell' ? 'text-red-500' : 'text-green-500' }}">
                                 <span>{{ number_format($trade['price'], 1) }}</span>
                                 <span>{{ $trade['amount'] }}</span>
                                 <span class="text-white/50">{{ $trade['time'] }}</span>
@@ -115,7 +121,8 @@
             </div>
 
             {{-- Trade Panel --}}
-            <div class="col-span-3 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
+            <div
+                class="col-span-3 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
                 <div class="flex gap-2 mb-3">
                     <button class="flex-1 btn btn-sm bg-blue-500 border-0 text-white">Buka</button>
                     <button class="flex-1 btn btn-sm btn-ghost text-white/60">Tutup</button>
@@ -168,9 +175,11 @@
         </div>
 
         {{-- Bottom Tabs: Posisi / Order / dll --}}
-        <div class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
+        <div
+            class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
             <div class="flex gap-4 text-sm mb-3 border-b border-line-new pb-2">
-                <span class="font-semibold border-b-2 border-blue-500 pb-2 -mb-2">Posisi({{ count($positions ?? []) }})</span>
+                <span
+                    class="font-semibold border-b-2 border-blue-500 pb-2 -mb-2">Posisi({{ count($positions ?? []) }})</span>
                 <span class="text-white/50">Transaksi terbuka(0)</span>
                 <span class="text-white/50">Riwayat Order</span>
                 <span class="text-white/50">Riwayat Perdagangan</span>
