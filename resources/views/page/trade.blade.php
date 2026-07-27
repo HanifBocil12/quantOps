@@ -22,12 +22,12 @@
 
             <div>
                 <div class="text-white/50 text-xs">Mark</div>
-                <div>{{ $coin['pair'] }}</div>
+                <div>{{ $coin['price'] }}</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Indeks</div>
-                <div>65.056,6</div>
+                <div>{{ $coin['price'] }}</div>
             </div>
 
             <div>
@@ -37,7 +37,7 @@
 
             <div>
                 <div class="text-white/50 text-xs">High 24Jam</div>
-                <div>65.722,5</div>
+                <div>{{ $coin['highPrice'] }}</div>
             </div>
 
             <div>
