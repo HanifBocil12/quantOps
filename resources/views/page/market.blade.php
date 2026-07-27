@@ -24,7 +24,20 @@
                                     </div>
                                     <span class="text-sm">{{ $coin['symbol'] }}</span>
                                 </div>
-                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <div class="text-end">
+                                    <div class="text-sm font-medium">
+                                        @if ($coin['price'] >= 1)
+                                            {{ number_format($coin['price'], 2) }}
+                                        @elseif ($coin['price'] >= 0.01)
+                                            {{ number_format($coin['price'], 4) }}
+                                        @elseif ($coin['price'] >= 0.0001)
+                                            {{ number_format($coin['price'], 6) }}
+                                        @else
+                                            {{ number_format($coin['price'], 8) }}
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
                                     {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
@@ -35,7 +48,7 @@
                 </div>
             </div>
 
-            {{-- Baru — TETAP pakai collect($markets), belum ada Service method --}}
+            {{-- Baru --}}
             <div
                 class="card flex flex-1 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%]">
                 <div class="card-body gap-3">
@@ -54,7 +67,20 @@
                                     </div>
                                     <span class="text-sm">{{ $coin['symbol'] }}</span>
                                 </div>
-                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <div class="text-end">
+                                    <div class="text-sm font-medium">
+                                        @if ($coin['price'] >= 1)
+                                            {{ number_format($coin['price'], 2) }}
+                                        @elseif ($coin['price'] >= 0.01)
+                                            {{ number_format($coin['price'], 4) }}
+                                        @elseif ($coin['price'] >= 0.0001)
+                                            {{ number_format($coin['price'], 6) }}
+                                        @else
+                                            {{ number_format($coin['price'], 8) }}
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
                                     {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
@@ -84,7 +110,20 @@
                                     </div>
                                     <span class="text-sm">{{ $coin['symbol'] }}</span>
                                 </div>
-                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <div class="text-end">
+                                    <div class="text-sm font-medium">
+                                        @if ($coin['price'] >= 1)
+                                            {{ number_format($coin['price'], 2) }}
+                                        @elseif ($coin['price'] >= 0.01)
+                                            {{ number_format($coin['price'], 4) }}
+                                        @elseif ($coin['price'] >= 0.0001)
+                                            {{ number_format($coin['price'], 6) }}
+                                        @else
+                                            {{ number_format($coin['price'], 8) }}
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                </div>
                                 <span class="text-sm text-green-500">
                                     +{{ number_format($coin['change_pct'], 2) }}%
                                 </span>
@@ -113,7 +152,20 @@
                                     </div>
                                     <span class="text-sm">{{ $coin['symbol'] }}</span>
                                 </div>
-                                <span class="text-sm">Rp{{ number_format($coin['price'] * 16000, 0, ',', '.') }}</span>
+                                <div class="text-end">
+                                    <div class="text-sm font-medium">
+                                        @if ($coin['price'] >= 1)
+                                            {{ number_format($coin['price'], 2) }}
+                                        @elseif ($coin['price'] >= 0.01)
+                                            {{ number_format($coin['price'], 4) }}
+                                        @elseif ($coin['price'] >= 0.0001)
+                                            {{ number_format($coin['price'], 6) }}
+                                        @else
+                                            {{ number_format($coin['price'], 8) }}
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
+                                </div>
                                 <span
                                     class="text-sm {{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
                                     {{ $coin['change_pct'] > 0 ? '+' : '' }}{{ number_format($coin['change_pct'], 2) }}%
@@ -187,7 +239,16 @@
                         </td>
                         <td>
                             <div class="font-bold">
-                                {{ \App\Http\Controllers\BinanceController::formatPrice($coin['price']) }}</div>
+                                @if ($coin['price'] >= 1)
+                                    {{ number_format($coin['price'], 2) }}
+                                @elseif ($coin['price'] >= 0.01)
+                                    {{ number_format($coin['price'], 4) }}
+                                @elseif ($coin['price'] >= 0.0001)
+                                    {{ number_format($coin['price'], 6) }}
+                                @else
+                                    {{ number_format($coin['price'], 8) }}
+                                @endif
+                            </div>
                             <div class="text-sm text-white/50">Rp{{ number_format($coin['price'] * 16000, 2) }}</div>
                         </td>
                         <td class="{{ $coin['change_pct'] >= 0 ? 'text-green-500' : 'text-red-500' }}">
