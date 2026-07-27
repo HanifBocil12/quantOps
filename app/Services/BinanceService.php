@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
 class BinanceService
@@ -143,4 +144,31 @@ class BinanceService
         $query = http_build_query($params);
         return hash_hmac('sha256', $query, $this->apiSecret);
     }
+
+    public function getPopular(int $limit = 3): Collection
+    {
+        return collect($this->getMarketList())->filter(fn($t) => in_array($t['symbol'], $this->majorPairs()))
+            ->sortByDesc('quoteVolume')
+            ->take($limit);
+    }
+
+    private function majorPairs(): array
+    {
+        return ['BTCUSDT', 'ETHUSDT', 'USDCUSDT'];
+    }
+
+    public function getTertinggi(int $limit = 3): Collection
+    {
+        return collect($this->getMarketList())
+            ->sortByDesc('priceChangePercent')
+            ->take($limit);
+    }
+
+    public function getVolumeTeratas(int $limit = 3): Collection
+    {
+        return collect($this->getMarketList())
+            ->sortByDesc('quoteVolume')
+            ->take($limit);
+    }
+    
 }
