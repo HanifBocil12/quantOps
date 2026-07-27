@@ -228,7 +228,8 @@
             </thead>
             <tbody>
                 @foreach ($markets as $coin)
-                    <tr class="text-end hover:bg-white/5 transition">
+                    <tr onclick="window.location='{{ route('trade', ['pair' => $coin['pair']]) }}'"
+                        class="text-end hover:bg-white/5 transition">
                         <td class="text-start">
                             <div class="flex items-center gap-2">
                                 <div
@@ -262,9 +263,7 @@
                         <td>-</td>
                         <td>
                             <div class="flex items-center justify-end gap-3">
-                                <a href="{{ route('trade', ['pair' => $coin['pair']]) }}">
-                                    <i class="ph ph-chart-bar"></i>
-                                </a>
+                                <button><i class="ph ph-chart-bar"></i></button>
                                 <button><i class="ph ph-star"></i></button>
                             </div>
                         </td>
