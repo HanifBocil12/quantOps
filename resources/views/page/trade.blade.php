@@ -42,12 +42,12 @@
 
             <div>
                 <div class="text-white/50 text-xs">Low 24Jam</div>
-                <div>64.379,7</div>
+                <div>{{ $coin['lowPrice'] }}</div>
             </div>
 
             <div>
                 <div class="text-white/50 text-xs">Vol. 24 Jam(BTC)</div>
-                <div>91.174.762</div>
+                <div>{{ $coin['lowPrice'] }}</div>
             </div>
 
             <div>

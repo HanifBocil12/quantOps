@@ -170,5 +170,4 @@ class BinanceService
             ->sortByDesc('quoteVolume')
             ->take($limit);
     }
-    
 }
