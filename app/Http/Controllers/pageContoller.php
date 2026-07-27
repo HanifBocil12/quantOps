@@ -55,7 +55,7 @@ class pageContoller extends Controller
     {
         return view('welcome');
     }
-    public function trade()
+    public function trade(string $pair)
     {
         return view('page.trade', compact('pair'));
     }
