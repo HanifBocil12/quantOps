@@ -51,6 +51,10 @@ class pageContoller extends Controller
     {
         return view('page.signup');
     }
+    public function privacy()
+    {
+        return view('page.service');
+    }
     public function welcome()
     {
         return view('welcome');
