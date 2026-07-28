@@ -26,10 +26,11 @@ Route::get('/cron/run-schedule', function () {
     return response()->json(['status' => 'ok', 'output' => Artisan::output()]);
 });
 
-Route::get('/cron/clear-lock', function () {
+Route::get('/cron/check-cache', function () {
     if (request()->query('secret') !== config('services.cron.cron_secret')) {
         abort(403);
     }
-    \Illuminate\Support\Facades\Cache::flush();
-    return 'cleared';
+    return response()->json([
+        'telegram_news' => \Illuminate\Support\Facades\Cache::get('telegram_news', 'EMPTY_OR_NOT_SET'),
+    ]);
 });
