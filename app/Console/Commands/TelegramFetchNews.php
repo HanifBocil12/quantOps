@@ -4,18 +4,15 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use danog\MadelineProto\API;
-use danog\MadelineProto\Settings;
-use danog\MadelineProto\Settings\Connection;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Proxy\SocksProxy;
+use Symfony\Component\DomCrawler\Crawler;
 
 class TelegramFetchNews extends Command
 {
     protected $signature = 'telegram:fetch-news';
-    protected $description = 'Fetch latest messages from subscribed Telegram channels via MadelineProto';
+    protected $description = 'Fetch latest messages from public Telegram channels via t.me/s/ scraping';
 
     protected array $channels = [
         'BitcoinMagazineTelegram',
@@ -30,75 +27,64 @@ class TelegramFetchNews extends Command
 
     public function handle(): int
     {
-        $settings = new Settings;
-        $settings->getLogger()->setLevel(Logger::LEVEL_WARNING);
-
-        // --- Proxy config (Webshare SOCKS5) ---
-        $proxyHost = config('services.telegram_proxy.host');
-        $proxyPort = config('services.telegram_proxy.port');
-        $proxyUser = config('services.telegram_proxy.user');
-        $proxyPass = config('services.telegram_proxy.pass');
-
-        if ($proxyHost && $proxyPort) {
-            $connection = new Connection;
-            $connection->addProxy(SocksProxy::class, [
-                'address'  => $proxyHost,
-                'port'     => (int) $proxyPort,
-                'username' => $proxyUser,
-                'password' => $proxyPass,
-            ]);
-            $settings->setConnection($connection);
-        }
-        // --- End proxy config ---
-
         $allNews = [];
         $debug = [];
 
-        // --- Bungkus start() dengan try/catch ---
-        try {
-            $MadelineProto = new API(base_path('session.madeline'), $settings);
-            $MadelineProto->start();
-        } catch (\Throwable $e) {
-            Cache::put('telegram_news', [], now()->addMinutes(10));
-            Cache::put('telegram_news_debug', ['START_ERROR' => $e->getMessage()], now()->addMinutes(10));
-            $this->error('MadelineProto start failed: ' . $e->getMessage());
-            Log::error('MadelineProto start failed: ' . $e->getMessage());
-            return self::FAILURE;
-        }
-        // --- End try/catch start() ---
-
         foreach ($this->channels as $channel) {
             try {
-                $result = $MadelineProto->messages->getHistory([
-                    'peer'        => "@{$channel}",
-                    'offset_id'   => 0,
-                    'offset_date' => 0,
-                    'add_offset'  => 0,
-                    'limit'       => 20,
-                    'max_id'      => 0,
-                    'min_id'      => 0,
-                    'hash'        => 0,
-                ]);
+                $response = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (compatible; QuantOpsBot/1.0)',
+                ])
+                    ->timeout(10)
+                    ->get("https://t.me/s/{$channel}");
 
-                $rawCount = count($result['messages'] ?? []);
+                if (!$response->successful()) {
+                    $debug[$channel] = "ERROR: HTTP {$response->status()}";
+                    continue;
+                }
+
+                $crawler = new Crawler($response->body());
+                $nodes = $crawler->filter('div.tgme_widget_message');
+
+                $rawCount = $nodes->count();
                 $withText = 0;
 
-                foreach ($result['messages'] as $msg) {
-                    if (empty($msg['message'])) continue;
+                $nodes->each(function (Crawler $node) use (&$allNews, &$withText, $channel) {
+                    $textNode = $node->filter('.tgme_widget_message_text');
+                    if ($textNode->count() === 0) {
+                        return;
+                    }
+
+                    $text = $this->extractText($textNode);
+                    $text = $this->stripSponsoredTail($text);
+
+                    if ($text === '') {
+                        return;
+                    }
+
                     $withText++;
+
+                    $postAttr = $node->attr('data-post');
+                    $msgId = $postAttr ? Str::afterLast($postAttr, '/') : null;
+
+                    $dateNode = $node->filter('time');
+                    $datetime = $dateNode->count() > 0
+                        ? strtotime($dateNode->attr('datetime'))
+                        : time();
 
                     $allNews[] = [
                         'source'    => $channel,
-                        'title'     => Str::limit($msg['message'], 120),
-                        'text'      => $msg['message'],
-                        'url'       => "https://t.me/{$channel}/{$msg['id']}",
-                        'published' => $msg['date'],
+                        'title'     => Str::limit($text, 120),
+                        'text'      => $text,
+                        'url'       => $msgId ? "https://t.me/{$channel}/{$msgId}" : "https://t.me/s/{$channel}",
+                        'published' => $datetime,
                     ];
-                }
+                });
 
                 $debug[$channel] = "OK: {$rawCount} raw, {$withText} with text";
             } catch (\Throwable $e) {
                 $debug[$channel] = "ERROR: " . $e->getMessage();
+                Log::error("Telegram scrape failed for {$channel}: " . $e->getMessage());
                 continue;
             }
         }
@@ -111,5 +97,31 @@ class TelegramFetchNews extends Command
         $this->info('Fetched ' . count($allNews) . ' messages, cached for 10 minutes.');
 
         return self::SUCCESS;
+    }
+
+    protected function extractText(Crawler $textNode): string
+    {
+        $html = $textNode->html();
+
+        $html = preg_replace('/<br\b[^>]*>/i', "\n", $html);
+        $html = preg_replace('/<[^>]+>/', ' ', $html);
+
+        $text = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/[ \t\x{00A0}]+/u', ' ', $text);
+        $text = preg_replace('/ *\n */', "\n", $text);
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+
+        // Heuristik: kalimat/segmen yang ke-nempel tanpa spasi (period langsung diikuti huruf kapital)
+        $text = preg_replace('/([a-z0-9])\.([A-Z])/', '$1. $2', $text);
+
+        $text = trim($text);
+
+        return $text;
+    }
+
+    protected function stripSponsoredTail(string $text): string
+    {
+        // Buang segmen "Sponsored by X — link" / "Sponsored by X - link" di ekor teks
+        return trim(preg_replace('/\s*Sponsored by .+?(—|-)\s*link\s*$/iu', '', $text));
     }
 }
