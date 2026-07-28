@@ -169,17 +169,17 @@ class NewsService
             [
                 'city' => 'London',
                 'region' => 'Europe',
-                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News (sering live)
+                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News (24/7 live)
             ],
             [
                 'city' => 'Frankfurt',
                 'region' => 'Europe',
-                'channel_id' => 'UCkI2PJgVjH3tq3nJ1V5z9Xw', // Reuters (sering live)
+                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN (24/7 live)
             ],
             [
                 'city' => 'Berlin',
                 'region' => 'Europe',
-                'channel_id' => 'UCkI2PJgVjH3tq3nJ1V5z9Xw', // Reuters
+                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN
             ],
 
             // AMERICAS
@@ -191,7 +191,7 @@ class NewsService
             [
                 'city' => 'Washington DC',
                 'region' => 'Americas',
-                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                'channel_id' => 'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News (sering live)
             ],
 
             // ASIA
@@ -203,12 +203,12 @@ class NewsService
             [
                 'city' => 'Singapore',
                 'region' => 'Asia',
-                'channel_id' => 'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                'channel_id' => 'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA (sering live)
             ],
             [
                 'city' => 'Hong Kong',
                 'region' => 'Asia',
-                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
+                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera (sering live)
             ],
 
             // MIDDLE EAST
@@ -222,7 +222,7 @@ class NewsService
             [
                 'city' => 'ISS Live',
                 'region' => 'Space',
-                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw', // NASA
+                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw', // NASA (sering live)
             ],
 
         ];
@@ -231,8 +231,8 @@ class NewsService
             ->map(function ($channel) {
                 $video = $this->searchYoutubeLive($channel['channel_id']);
 
-                // Log untuk debug
-                Log::info('Channel: ' . $channel['city'] . ' - Video found: ' . ($video ? 'YES' : 'NO'));
+                // Logging
+                logger('Channel: ' . $channel['city'] . ' - Video: ' . ($video ? 'YES - ' . $video['title'] : 'NO'));
 
                 return [
                     'city' => $channel['city'],
