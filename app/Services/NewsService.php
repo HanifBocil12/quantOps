@@ -163,7 +163,6 @@ class NewsService
 
     public function getLiveWebcams(): array
     {
-        // Definisikan multiple channel per kota
         $cityChannels = [
 
             // EUROPE
@@ -172,8 +171,6 @@ class NewsService
                 'channels' => [
                     'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
-                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
-                    'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
                 ]
             ],
             'Frankfurt' => [
@@ -181,7 +178,6 @@ class NewsService
                 'channels' => [
                     'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
-                    'UCknLrEdhRCp1aegoMqRaCZg', // DW News
                 ]
             ],
             'Berlin' => [
@@ -189,7 +185,6 @@ class NewsService
                 'channels' => [
                     'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
                     'UCknLrEdhRCp1aegoMqRaCZg', // DW News
-                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                 ]
             ],
 
@@ -199,26 +194,22 @@ class NewsService
                 'channels' => [
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                     'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
-                    'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
-                    'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
                 ]
             ],
             'Washington DC' => [
                 'region' => 'Americas',
                 'channels' => [
                     'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
-                    'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                 ]
             ],
 
-            // ASIA
+            // ASIA - PAKE WEBCAM CHANNEL!
             'Tokyo' => [
                 'region' => 'Asia',
                 'channels' => [
-                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
-                    'UC19xL2I6UMy8yQ6cP9F9tRg', // NHK World
-                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                    'UCXeB_-XGzPjOmc5aOwGHC9A', // TOKYO Live Camera TV ✅
+                    'UC8oWZuLFc_eBA0LmgWFA2Rw', // Suginami River Live Cam ✅
                 ]
             ],
             'Singapore' => [
@@ -226,7 +217,6 @@ class NewsService
                 'channels' => [
                     'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
                     'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
-                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
                 ]
             ],
             'Hong Kong' => [
@@ -234,7 +224,6 @@ class NewsService
                 'channels' => [
                     'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
                     'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
-                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
                 ]
             ],
 
@@ -244,7 +233,6 @@ class NewsService
                 'channels' => [
                     'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
                     'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
-                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                 ]
             ],
 
@@ -253,7 +241,6 @@ class NewsService
                 'region' => 'Space',
                 'channels' => [
                     'UCRuCgmzhczsm89jzPtN2Wuw', // NASA
-                    'UCRuCgmzhczsm89jzPtN2Wuw', // NASA (cuma 1)
                 ]
             ],
 
@@ -264,13 +251,11 @@ class NewsService
         foreach ($cityChannels as $city => $config) {
             $video = null;
 
-            // Coba semua channel untuk kota ini
             foreach ($config['channels'] as $channelId) {
                 $video = $this->searchYoutubeLive($channelId);
-
                 if ($video) {
-                    logger('Found live for ' . $city . ' from channel: ' . $channelId);
-                    break; // Berhenti kalo udah ketemu
+                    logger('✅ Found live for ' . $city . ' from: ' . $channelId);
+                    break;
                 }
             }
 
@@ -317,7 +302,7 @@ class NewsService
             'status' => 'live',
         ];
     }
-    
+
     protected function categorizeGeneralNews(array $news): array
     {
         return [
