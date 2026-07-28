@@ -165,81 +165,71 @@ class NewsService
     {
         $channels = [
 
+            // EUROPE
             [
                 'city' => 'London',
                 'region' => 'Europe',
-                'channel_id' => 'UCeY6eJwRcZLlFp7VzI5iVjw',
+                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
             ],
-
             [
                 'city' => 'Frankfurt',
                 'region' => 'Europe',
-                'channel_id' => 'UCh3Nt6x9hBxN7y2RjT5jFg',
+                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg', // DW News
             ],
-
             [
                 'city' => 'Berlin',
                 'region' => 'Europe',
-                'channel_id' => 'UCb1E5l9MZrA2Lp0n8wSb4Ug',
+                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg', // DW News
             ],
 
-
+            // AMERICAS
             [
                 'city' => 'New York',
                 'region' => 'Americas',
-                'channel_id' => 'UCgPClNr5kFg5Jp5zL4xJp1Q',
+                'channel_id' => 'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
             ],
-
             [
                 'city' => 'Washington DC',
                 'region' => 'Americas',
-                'channel_id' => 'UCG1oN4rJkLxW3vY7yZr5p9A',
+                'channel_id' => 'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
             ],
 
-
+            // ASIA
             [
                 'city' => 'Tokyo',
                 'region' => 'Asia',
-                'channel_id' => 'UCVq6O7nRq8nO2Hn6sK9jLqA',
+                'channel_id' => 'UC19xL2I6UMy8yQ6cP9F9tRg', // NHK World
             ],
-
             [
                 'city' => 'Singapore',
                 'region' => 'Asia',
-                'channel_id' => 'UCU2P1yW9rNq3Ml4tKp0jHnQ',
+                'channel_id' => 'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
             ],
-
             [
                 'city' => 'Hong Kong',
                 'region' => 'Asia',
-                'channel_id' => 'UCU8pN4jWl8VvY2z3xRq7mBc',
+                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
             ],
 
-
+            // MIDDLE EAST
             [
                 'city' => 'Dubai',
                 'region' => 'Middle East',
-                'channel_id' => 'UCV1jL6rNq5Mx2p9sWk4gHbQ',
+                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
             ],
 
-
+            // SPACE
             [
                 'city' => 'ISS Live',
                 'region' => 'Space',
-                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw',
+                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw', // NASA
             ],
 
         ];
 
-
         return collect($channels)
             ->map(function ($channel) {
-
-                $video = $this->searchYoutubeLive(
-                    $channel['channel_id']
-                );
-
-
+                $video = $this->searchYoutubeLive($channel['channel_id']);
                 return [
                     'city' => $channel['city'],
                     'region' => $channel['region'],
