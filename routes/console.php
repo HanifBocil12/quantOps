@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::call(function () {
     Artisan::call('telegram:fetch-news');
-})->everyTwoMinutes()->withoutOverlapping()->name('telegram-fetch-news');
+})->name('telegram-fetch-news')->everyTwoMinutes()->withoutOverlapping();
