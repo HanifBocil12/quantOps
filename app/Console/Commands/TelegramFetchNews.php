@@ -50,8 +50,12 @@ class TelegramFetchNews extends Command
                     'hash'        => 0,
                 ]);
 
+                $rawCount = count($result['messages'] ?? []);
+                $withText = 0;
+
                 foreach ($result['messages'] as $msg) {
                     if (empty($msg['message'])) continue;
+                    $withText++;
 
                     $allNews[] = [
                         'source'    => $channel,
@@ -61,6 +65,8 @@ class TelegramFetchNews extends Command
                         'published' => $msg['date'],
                     ];
                 }
+
+                Log::info("Channel {$channel}: {$rawCount} raw messages, {$withText} with text");
             } catch (\Throwable $e) {
                 $this->error("Failed for {$channel}: " . $e->getMessage());
                 Log::warning("Telegram fetch failed for {$channel}: " . $e->getMessage());
