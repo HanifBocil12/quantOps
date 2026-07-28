@@ -341,24 +341,24 @@
                 .then(videos => {
 
                     document.getElementById('live-news-grid').innerHTML =
-                        videos.map(video => `
+                        videos.slice(0, 3).map(video => `
 
-                    <div class="bg-black rounded overflow-hidden">
+                        <div class="bg-black rounded overflow-hidden">
 
-                        <div class="p-2 text-xs text-base-content/70">
-                            ${video.source} - ${video.region}
+                            <div class="p-2 text-xs text-base-content/70">
+                                ${video.source} - ${video.region}
+                            </div>
+
+                            <iframe
+                                src="https://www.youtube.com/embed/${video.video_id}"
+                                class="w-full aspect-video"
+                                frameborder="0"
+                                allowfullscreen>
+                            </iframe>
+
                         </div>
 
-                        <iframe
-                        src="https://www.youtube.com/embed/${video.video_id}"
-                        class="w-full aspect-video rounded"
-                        frameborder="0"
-                        allowfullscreen>
-                        </iframe>
-
-                    </div>
-
-                `).join('');
+                        `).join('');
 
                 });
         });
