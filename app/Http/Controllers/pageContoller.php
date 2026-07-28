@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\BinanceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class pageContoller extends Controller
 {
@@ -16,7 +17,9 @@ class pageContoller extends Controller
     }
     public function news()
     {
-        return view('page.news');
+        return view('page.news', [
+            'news' => Cache::get('telegram_news', [])
+        ]);
     }
     public function execution()
     {
