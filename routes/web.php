@@ -3,7 +3,6 @@
 use App\Http\Controllers\BinanceController;
 use App\Http\Controllers\pageContoller;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
@@ -16,8 +15,13 @@ Route::get('/model', [pageContoller::class, 'model'])->name('model');
 Route::get('/execution', [pageContoller::class, 'execution'])->name('execution');
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');
-Route::get('/news/check', function () {
-    return response()->json([
-        'news' => Cache::get('telegram_news', [])
-    ]);
+
+Route::get('/cron/run-schedule', function () {
+    if (request()->query('secret') !== config('app.cron_secret')) {
+        abort(403);
+    }
+
+    Artisan::call('schedule:run');
+
+    return response()->json(['status' => 'ok', 'output' => Artisan::output()]);
 });

@@ -247,11 +247,6 @@
                     });
                 });
         });
-
-
-        setInterval(() => {
-            fetch('/news/check')
-        }, 120000);
     </script>
 </x-layout.app>
 
