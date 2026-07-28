@@ -161,74 +161,102 @@ class NewsService
         return $allNews;
     }
 
-    public function getLiveNews(): array
+    public function getLiveWebcams(): array
     {
         $channels = [
 
             [
-                'source' => 'DW News',
-                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg',
+                'city' => 'London',
                 'region' => 'Europe',
+                'channel_id' => 'UCeY6eJwRcZLlFp7VzI5iVjw',
             ],
 
             [
-                'source' => 'CNBC',
-                'channel_id' => 'UCvJJ_dzjViJCoLf5uKUTwoA',
+                'city' => 'Frankfurt',
+                'region' => 'Europe',
+                'channel_id' => 'UCh3Nt6x9hBxN7y2RjT5jFg',
+            ],
+
+            [
+                'city' => 'Berlin',
+                'region' => 'Europe',
+                'channel_id' => 'UCb1E5l9MZrA2Lp0n8wSb4Ug',
+            ],
+
+
+            [
+                'city' => 'New York',
                 'region' => 'Americas',
+                'channel_id' => 'UCgPClNr5kFg5Jp5zL4xJp1Q',
             ],
 
             [
-                'source' => 'Bloomberg',
-                'channel_id' => 'UCIALMKvObZNtJ6AmdCLP7Lg',
+                'city' => 'Washington DC',
                 'region' => 'Americas',
+                'channel_id' => 'UCG1oN4rJkLxW3vY7yZr5p9A',
+            ],
+
+
+            [
+                'city' => 'Tokyo',
+                'region' => 'Asia',
+                'channel_id' => 'UCVq6O7nRq8nO2Hn6sK9jLqA',
             ],
 
             [
-                'source' => 'CNA',
-                'channel_id' => 'UC83jt4dlz1Gjl58fzQrrKZg',
+                'city' => 'Singapore',
                 'region' => 'Asia',
+                'channel_id' => 'UCU2P1yW9rNq3Ml4tKp0jHnQ',
             ],
 
             [
-                'source' => 'NHK World',
-                'channel_id' => 'UC7JQ0k9gJ2M9x2yP9fYz5xA',
+                'city' => 'Hong Kong',
                 'region' => 'Asia',
+                'channel_id' => 'UCU8pN4jWl8VvY2z3xRq7mBc',
+            ],
+
+
+            [
+                'city' => 'Dubai',
+                'region' => 'Middle East',
+                'channel_id' => 'UCV1jL6rNq5Mx2p9sWk4gHbQ',
+            ],
+
+
+            [
+                'city' => 'ISS Live',
+                'region' => 'Space',
+                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw',
             ],
 
         ];
 
 
-        $result = [];
+        return collect($channels)
+            ->map(function ($channel) {
+
+                $video = $this->searchYoutubeLive(
+                    $channel['channel_id']
+                );
 
 
-        foreach ($channels as $channel) {
-
-            $video = $this->searchYoutubeLive(
-                $channel['channel_id']
-            );
-
-
-            if ($video) {
-
-                $result[] = [
-                    'source' => $channel['source'],
+                return [
+                    'city' => $channel['city'],
                     'region' => $channel['region'],
-                    'title' => $video['title'],
-                    'video_id' => $video['videoId'],
-                    'thumbnail' => $video['thumbnail'],
-                    'status' => $video['status'],
+                    'title' => $video['title'] ?? 'Offline',
+                    'video_id' => $video['videoId'] ?? null,
+                    'thumbnail' => $video['thumbnail'] ?? null,
+                    'status' => $video['status'] ?? 'offline',
                 ];
-            }
-        }
-
-
-        return $result;
+            })
+            ->values()
+            ->toArray();
     }
 
 
     protected function searchYoutubeLive(string $channelId): ?array
     {
-        $response = Http::get(
+        $response = Http::timeout(5)->get(
             'https://www.googleapis.com/youtube/v3/search',
             [
                 'key' => env('YOUTUBE_API_KEY'),
@@ -243,6 +271,7 @@ class NewsService
 
         $item = $response->json('items.0');
 
+
         if (!$item) {
             return null;
         }
@@ -251,7 +280,8 @@ class NewsService
         return [
             'videoId' => $item['id']['videoId'],
             'title' => $item['snippet']['title'],
-            'thumbnail' => $item['snippet']['thumbnails']['high']['url'],
+            'thumbnail' => $item['snippet']['thumbnails']['high']['url']
+                ?? null,
             'status' => $item['snippet']['liveBroadcastContent'],
         ];
     }

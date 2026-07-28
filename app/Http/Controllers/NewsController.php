@@ -24,10 +24,10 @@ class NewsController extends Controller
         );
     }
 
-    public function getLiveNews()
+    public function getLiveWebcams()
     {
         return response()->json(
-            $this->newsService->getLiveNews()
+            $this->newsService->getLiveWebcams()
         );
     }
 

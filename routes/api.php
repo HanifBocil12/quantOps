@@ -27,7 +27,7 @@ Route::prefix('news')->group(function () {
     Route::get('/world-news', [NewsController::class, 'getWorldNews'])
         ->name('news.world');
 
-    Route::get('/live-news', [NewsController::class, 'getLiveNews'])
-        ->name('news.live');
+    Route::get('/getLiveWebcams', [NewsController::class, 'getLiveWebcams'])
+        ->name('news.webcam');
 
 });

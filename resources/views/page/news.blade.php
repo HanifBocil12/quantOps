@@ -15,26 +15,55 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-200 border border-base-300 h-full w-full">
-            <div class="card-body p-4 h-full w-full">
+        <div class="card bg-base-100 shadow-sm border border-base-300">
+
+            <div class="card-body p-4">
 
                 <h3 class="text-sm font-semibold text-base-content/70">
-                    Live news
+                    Live Webcams
                 </h3>
 
-                <div class="mt-2 flex-1 overflow-y-auto">
 
-                    <div id="live-news-grid" class="grid grid-cols-1 gap-3">
+                <div class="tabs tabs-boxed mt-2">
 
-                        <p class="text-xs text-base-content/40">
-                            Loading live...
-                        </p>
+                    <button class="tab tab-active" onclick="filterWebcams('ALL')">
+                        ALL
+                    </button>
 
-                    </div>
+                    <button class="tab" onclick="filterWebcams('Europe')">
+                        Europe
+                    </button>
+
+                    <button class="tab" onclick="filterWebcams('Americas')">
+                        Americas
+                    </button>
+
+                    <button class="tab" onclick="filterWebcams('Asia')">
+                        Asia
+                    </button>
+
+                    <button class="tab" onclick="filterWebcams('Middle East')">
+                        Middle East
+                    </button>
+
+                    <button class="tab" onclick="filterWebcams('Space')">
+                        Space
+                    </button>
 
                 </div>
 
+
+                <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 overflow-y-auto">
+
+                    <p class="text-xs text-base-content/40">
+                        Loading webcams...
+                    </p>
+
+                </div>
+
+
             </div>
+
         </div>
 
         <div class="card bg-base-200 border border-base-300 h-full w-full">
@@ -336,31 +365,88 @@
 
             // LIVE YOUTUBE NEWS
 
-            fetch('{{ route('news.live') }}')
-                .then(r => r.json())
-                .then(videos => {
+            let webcams = [];
 
-                    document.getElementById('live-news-grid').innerHTML =
-                        videos.slice(0, 3).map(video => `
 
-                        <div class="bg-black rounded overflow-hidden">
+            fetch("{{ route('news.webcams') }}")
+                .then(response => response.json())
+                .then(data => {
 
-                            <div class="p-2 text-xs text-base-content/70">
-                                ${video.source} - ${video.region}
-                            </div>
+                    webcams = data;
 
-                            <iframe
-                                src="https://www.youtube.com/embed/${video.video_id}"
-                                class="w-full aspect-video"
-                                frameborder="0"
-                                allowfullscreen>
-                            </iframe>
-
-                        </div>
-
-                        `).join('');
+                    renderWebcams('ALL');
 
                 });
+
+
+            function filterWebcams(region) {
+                renderWebcams(region);
+            }
+
+
+
+            function renderWebcams(region) {
+
+                let filtered = region === 'ALL' ?
+                    webcams :
+                    webcams.filter(
+                        webcam => webcam.region === region
+                    );
+
+
+                document.getElementById('webcam-grid').innerHTML =
+                    filtered.map(webcam => {
+
+
+                        if (!webcam.video_id) {
+
+                            return `
+
+                                <div class="bg-base-200 rounded-lg p-3">
+
+                                    <div class="text-sm font-semibold">
+                                        ${webcam.city}
+                                    </div>
+
+                                    <div class="text-xs text-error">
+                                        Offline
+                                    </div>
+
+                                </div>
+
+                                `;
+
+                        }
+
+
+                        return `
+
+                    <div class="bg-black rounded-lg overflow-hidden">
+
+                        <div class="p-2 text-xs text-white">
+                            ${webcam.city}
+                            <span class="opacity-50">
+                                ${webcam.region}
+                            </span>
+                        </div>
+
+
+                        <iframe
+                            src="https://www.youtube.com/embed/${webcam.video_id}"
+                            class="w-full aspect-video"
+                            frameborder="0"
+                            allowfullscreen>
+                        </iframe>
+
+
+                    </div>
+
+                    `;
+
+
+                    }).join('');
+
+            }
         });
     </script>
 </x-layout.app>
