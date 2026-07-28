@@ -161,6 +161,57 @@ class NewsService
         return $allNews;
     }
 
+    public function getLiveNews(): array
+    {
+        $video = $this->searchYoutubeLive(
+            'UCknLrEdhRCp1aegoMqRaCZg'
+        );
+
+        if (!$video) {
+            return [];
+        }
+
+        return [
+            [
+                'source' => 'DW News',
+                'title' => $video['title'],
+                'video_id' => $video['videoId'],
+                'thumbnail' => $video['thumbnail'],
+                'status' => $video['status'],
+            ]
+        ];
+    }
+
+
+    protected function searchYoutubeLive(string $channelId): ?array
+    {
+        $response = Http::get(
+            'https://www.googleapis.com/youtube/v3/search',
+            [
+                'key' => env('YOUTUBE_API_KEY'),
+                'channelId' => $channelId,
+                'part' => 'snippet',
+                'eventType' => 'live',
+                'type' => 'video',
+                'maxResults' => 1,
+            ]
+        );
+
+
+        $item = $response->json('items.0');
+
+        if (!$item) {
+            return null;
+        }
+
+
+        return [
+            'videoId' => $item['id']['videoId'],
+            'title' => $item['snippet']['title'],
+            'thumbnail' => $item['snippet']['thumbnails']['high']['url'],
+            'status' => $item['snippet']['liveBroadcastContent'],
+        ];
+    }
     protected function categorizeGeneralNews(array $news): array
     {
         return [

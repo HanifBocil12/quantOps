@@ -24,10 +24,13 @@
 
                 <div class="mt-2 flex-1 overflow-y-auto">
 
-                    <div class="aspect-video rounded overflow-hidden bg-black">
-                        <iframe src="https://www.youtube.com/embed/LuKwFajn37U" class="w-full h-full" frameborder="0"
-                            allow="autoplay; encrypted-media" allowfullscreen>
-                        </iframe>
+                    <div id="live-news-video"
+                        class="aspect-video rounded overflow-hidden bg-black flex items-center justify-center">
+
+                        <p class="text-xs text-base-content/40">
+                            Loading live...
+                        </p>
+
                     </div>
 
                 </div>
@@ -331,6 +334,51 @@
                     );
 
                 })
+
+            // LIVE YOUTUBE NEWS
+
+            fetch('{{ route('news.live') }}')
+                .then(r => r.json())
+                .then(data => {
+
+                    const container = document.getElementById('live-news-video');
+
+
+                    if (!data.length || !data[0].video_id) {
+
+                        container.innerHTML = `
+                <p class="text-xs text-base-content/40">
+                    No live stream
+                </p>
+            `;
+
+                        return;
+                    }
+
+
+                    const videoId = data[0].video_id;
+
+
+                    container.innerHTML = `
+            <iframe
+                src="https://www.youtube.com/embed/${videoId}"
+                class="w-full h-full"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+        `;
+
+                })
+                .catch(() => {
+
+                    document.getElementById('live-news-video').innerHTML = `
+            <p class="text-xs text-base-content/40">
+                Failed to load live
+            </p>
+        `;
+
+                });
         });
     </script>
 </x-layout.app>

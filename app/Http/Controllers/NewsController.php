@@ -24,6 +24,14 @@ class NewsController extends Controller
         );
     }
 
+    public function getLiveNews()
+    {
+        return response()->json(
+            $this->newsService->getLiveNews()
+        );
+    }
+
+
     public function getWorldNews()
     {
         return response()->json(
