@@ -26,32 +26,32 @@
 
                 <div class="tabs tabs-boxed mt-2">
 
-                    <button class="tab tab-active webcam-tab" data-region="ALL" onclick="filterWebcams('ALL')">
+                    <button class="tab tab-active webcam-tab" data-region="ALL">
                         ALL
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Europe" onclick="filterWebcams('Europe')">
+                    <button class="tab webcam-tab" data-region="Europe">
                         Europe
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Americas" onclick="filterWebcams('Americas')">
+                    <button class="tab webcam-tab" data-region="Americas">
                         Americas
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Asia" onclick="filterWebcams('Asia')">
+                    <button class="tab webcam-tab" data-region="Asia">
                         Asia
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Middle East" onclick="filterWebcams('Middle East')">
+                    <button class="tab webcam-tab" data-region="Middle Eastast">
                         Middle East
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Space" onclick="filterWebcams('Space')">
+                    <button class="tab webcam-tab" data-region="Space">
                         Space
                     </button>
 
@@ -384,9 +384,9 @@
                 });
 
 
-            function filterWebcams(region) {
-                renderWebcams(region);
+            window.filterWebcams = function(region) {
 
+                renderWebcams(region);
 
                 document.querySelectorAll('.webcam-tab')
                     .forEach(tab => {
@@ -398,7 +398,20 @@
                         }
 
                     });
-            }
+
+            };
+
+
+            document.querySelectorAll('.webcam-tab')
+                .forEach(tab => {
+
+                    tab.addEventListener('click', function() {
+
+                        filterWebcams(this.dataset.region);
+
+                    });
+
+                });
 
 
 
@@ -431,23 +444,23 @@
                 ?
 
                 `
-                            <iframe
-                                src="https://www.youtube.com/embed/${webcam.video_id}"
-                                class="w-full aspect-video"
-                                frameborder="0"
-                                allowfullscreen>
-                            </iframe>
-                            `
+                                            <iframe
+                                                src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                class="w-full aspect-video"
+                                                frameborder="0"
+                                                allowfullscreen>
+                                            </iframe>
+                                            `
 
                 :
 
                 `
-                            <div class="aspect-video flex items-center justify-center">
-                                <span class="text-xs text-error">
-                                    Offline
-                                </span>
-                            </div>
-                            `
+                                            <div class="aspect-video flex items-center justify-center">
+                                                <span class="text-xs text-error">
+                                                    Offline
+                                                </span>
+                                            </div>
+                                            `
 
             }
 
