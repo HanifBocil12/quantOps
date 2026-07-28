@@ -16,10 +16,12 @@ Route::get('/execution', [pageContoller::class, 'execution'])->name('execution')
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');
 
-Route::get('/cron/debug-secret', function () {
-    return response()->json([
-        'expected' => config('services.cron.cron_secret'),
-        'received' => request()->query('secret'),
-        'match' => config('services.cron.cron_secret') === request()->query('secret'),
-    ]);
+Route::get('/cron/run-schedule', function () {
+    if (request()->query('secret') !== config('services.cron.cron_secret')) {
+        abort(403);
+    }
+
+    Artisan::call('schedule:run');
+
+    return response()->json(['status' => 'ok', 'output' => Artisan::output()]);
 });
