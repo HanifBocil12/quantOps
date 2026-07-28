@@ -29,4 +29,7 @@ return [
         'base_url' => env('BINANCE_BASE_URL', 'https://api.binance.com'),
         'futures_url' => env('BINANCE_FUTURES_URL'),
     ],
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+    ],
 ];

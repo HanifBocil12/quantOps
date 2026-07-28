@@ -15,9 +15,13 @@ Route::get('/model', [pageContoller::class, 'model'])->name('model');
 Route::get('/execution', [pageContoller::class, 'execution'])->name('execution');
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');
-Route::match(['get', 'post'], '/system/fetch-news', function () {
 
-    Artisan::call('telegram:fetch-news');
+Route::get('/telegram-test', function () {
 
-    return 'ok';
+    $token = config('services.telegram.bot_token');
+
+    return Http::get(
+        "https://api.telegram.org/bot{$token}/getMe"
+    )->json();
+
 });
