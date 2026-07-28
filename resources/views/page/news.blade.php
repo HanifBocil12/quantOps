@@ -103,7 +103,7 @@
         <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Onchain data</h3>
-                <div class="mt-2 space-y-2 flex-1">
+                <div id="onchain-data" class="mt-2 space-y-2 flex-1 overflow-y-auto">
                     <div class="animate-pulse flex space-x-2">
                         <div class="flex-1 space-y-2">
                             <div class="h-2 bg-base-300 rounded"></div>
@@ -262,6 +262,10 @@
                 }).join('');
             }
 
+            function renderOnchainData(el, items) {
+                renderNews(el, items);
+            }
+
             fetch('{{ route('news.index') }}')
                 .then(r => r.json())
                 .then(news => {
@@ -285,15 +289,31 @@
                         '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
 
-
             fetch('{{ route('news.crypto') }}')
                 .then(r => r.json())
                 .then(grouped => {
-                    renderCryptoNewsGrouped(document.getElementById('crypto-news'), grouped);
+
+                    // Crypto News (tetap dua section)
+                    renderCryptoNewsGrouped(
+                        document.getElementById('crypto-news'),
+                        grouped
+                    );
+
+                    // Onchain Data (hanya Whale Alert)
+                    renderOnchainData(
+                        document.getElementById('onchain-data'),
+                        grouped.onchain_alert
+                    );
+
                 })
                 .catch(() => {
+
                     document.getElementById('crypto-news').innerHTML =
                         '<p class="text-xs text-base-content/40">Failed to load</p>';
+
+                    document.getElementById('onchain-data').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
+
                 });
         });
     </script>
