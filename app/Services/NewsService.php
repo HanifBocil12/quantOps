@@ -163,6 +163,18 @@ class NewsService
 
     public function getLiveWebcams(): array
     {
+        return Cache::remember(
+            'youtube_live_webcams',
+            now()->addMinutes(15),
+            function () {
+
+                return $this->fetchLiveWebcams();
+            }
+        );
+    }
+
+    private function fetchLiveWebcams(): array
+    {
         $cityChannels = [
 
             // EUROPE
@@ -249,23 +261,27 @@ class NewsService
         $result = [];
 
         foreach ($cityChannels as $city => $config) {
+
             $video = null;
 
             foreach ($config['channels'] as $channelId) {
+
                 $video = $this->searchYoutubeLive($channelId);
+
                 if ($video) {
-                    logger('✅ Found live for ' . $city . ' from: ' . $channelId);
+                    logger("FOUND {$city}");
                     break;
                 }
             }
 
+
             $result[] = [
                 'city' => $city,
                 'region' => $config['region'],
-                'title' => $video ? $video['title'] : 'Offline',
-                'video_id' => $video ? $video['videoId'] : null,
-                'thumbnail' => $video ? $video['thumbnail'] : null,
-                'status' => $video ? $video['status'] : 'offline',
+                'title' => $video['title'] ?? 'Offline',
+                'video_id' => $video['videoId'] ?? null,
+                'thumbnail' => $video['thumbnail'] ?? null,
+                'status' => $video['status'] ?? 'offline',
             ];
         }
 
@@ -288,16 +304,27 @@ class NewsService
         );
 
 
-        logger($response->json());
+        if ($response->failed()) {
+
+            logger()->error('Youtube API Error', [
+                'status' => $response->status(),
+                'body' => $response->json()
+            ]);
+
+            return null;
+        }
 
 
         $data = $response->json();
+
 
         if (empty($data['items'])) {
             return null;
         }
 
+
         $item = $data['items'][0];
+
 
         return [
             'videoId' => $item['id']['videoId'],
