@@ -8,6 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('telegram:fetch-news')
-    ->everyTwoMinutes()
-    ->withoutOverlapping();
+Schedule::call(function () {
+    Artisan::call('telegram:fetch-news');
+})->everyTwoMinutes()->withoutOverlapping()->name('telegram-fetch-news');
