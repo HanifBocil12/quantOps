@@ -15,8 +15,11 @@ Route::get('/model', [pageContoller::class, 'model'])->name('model');
 Route::get('/execution', [pageContoller::class, 'execution'])->name('execution');
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');
-Route::post('/system/fetch-news', function () {
+Route::get('/system/fetch-news', function () {
+
     Artisan::call('telegram:fetch-news');
 
-    return 'ok';
+    return response()->json([
+        'status' => 'ok'
+    ]);
 });
