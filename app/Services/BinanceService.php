@@ -94,15 +94,17 @@ class BinanceService
         ])->json();
 
         return [
-            'asks' => collect($data['asks'] ?? [])->map(fn($ask) => [
-                'price' => (float) $ask[0],
-                'amount' => (float) $ask[1],
-            ])->values(),
+            'asks' => collect($data['asks'] ?? [])
+                ->map(fn($ask) => [
+                    'price' => (float) $ask[0],
+                    'amount' => (float) $ask[1],
+                ]),
 
-            'bids' => collect($data['bids'] ?? [])->map(fn($bid) => [
-                'price' => (float) $bid[0],
-                'amount' => (float) $bid[1],
-            ])->values(),
+            'bids' => collect($data['bids'] ?? [])
+                ->map(fn($bid) => [
+                    'price' => (float) $bid[0],
+                    'amount' => (float) $bid[1],
+                ]),
         ];
     }
 
