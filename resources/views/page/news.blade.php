@@ -25,7 +25,7 @@
                 <div class="mt-2 flex-1 overflow-y-auto">
 
                     <div class="aspect-video rounded overflow-hidden bg-black">
-                        <iframe src="https://www.youtube.com/embed/qMtcWqCL_UQ" class="w-full h-full" frameborder="0"
+                        <iframe src="https://www.youtube.com/embed/LuKwFajn37U" class="w-full h-full" frameborder="0"
                             allow="autoplay; encrypted-media" allowfullscreen>
                         </iframe>
                     </div>
