@@ -10,6 +10,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Stream\Proxy\SocksProxy;
 
 class TelegramFetchNews extends Command
 {
@@ -40,26 +41,31 @@ class TelegramFetchNews extends Command
 
         if ($proxyHost && $proxyPort) {
             $connection = new Connection;
-            $connection->setProxies([
-                [
-                    'proxy' => \danog\MadelineProto\Connection::SOCKS5_PROXY,
-                    'extra' => [
-                        'address'  => $proxyHost,
-                        'port'     => (int) $proxyPort,
-                        'username' => $proxyUser,
-                        'password' => $proxyPass,
-                    ],
-                ],
+            $connection->addProxy(SocksProxy::class, [
+                'address'  => $proxyHost,
+                'port'     => (int) $proxyPort,
+                'username' => $proxyUser,
+                'password' => $proxyPass,
             ]);
             $settings->setConnection($connection);
         }
         // --- End proxy config ---
 
-        $MadelineProto = new API(base_path('session.madeline'), $settings);
-        $MadelineProto->start();
-
         $allNews = [];
         $debug = [];
+
+        // --- Bungkus start() dengan try/catch ---
+        try {
+            $MadelineProto = new API(base_path('session.madeline'), $settings);
+            $MadelineProto->start();
+        } catch (\Throwable $e) {
+            Cache::put('telegram_news', [], now()->addMinutes(10));
+            Cache::put('telegram_news_debug', ['START_ERROR' => $e->getMessage()], now()->addMinutes(10));
+            $this->error('MadelineProto start failed: ' . $e->getMessage());
+            Log::error('MadelineProto start failed: ' . $e->getMessage());
+            return self::FAILURE;
+        }
+        // --- End try/catch start() ---
 
         foreach ($this->channels as $channel) {
             try {
