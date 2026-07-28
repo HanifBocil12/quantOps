@@ -28,6 +28,6 @@ Route::prefix('news')->group(function () {
         ->name('news.world');
 
     Route::get('/getLiveWebcams', [NewsController::class, 'getLiveWebcams'])
-        ->name('news.webcam');
+        ->name('news.webcams');
 
 });
