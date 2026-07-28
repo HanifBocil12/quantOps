@@ -98,7 +98,7 @@ class BinanceService
 
         $data = $response->json();
 
-        dd($data);
+        // dd($data);
 
         return [
             'asks' => collect($data['asks'] ?? [])
