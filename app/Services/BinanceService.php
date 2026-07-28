@@ -90,27 +90,27 @@ class BinanceService
 
     public function getOrderBook(string $pair, int $limit = 20)
     {
-        $response = Http::get(
-            "{$this->futuresUrl}/fapi/v1/depth",
-            [
+        $response = $this->getHttpClient()
+            ->get("{$this->baseUrl}/api/v3/depth", [
                 'symbol' => strtoupper($pair),
                 'limit' => $limit,
-            ]
-        );
+            ]);
 
         $data = $response->json();
+
+        dd($data);
 
         return [
             'asks' => collect($data['asks'] ?? [])
                 ->map(fn($x) => [
-                    'price' => (float)$x[0],
-                    'amount' => (float)$x[1],
+                    'price' => (float) $x[0],
+                    'amount' => (float) $x[1],
                 ]),
 
             'bids' => collect($data['bids'] ?? [])
                 ->map(fn($x) => [
-                    'price' => (float)$x[0],
-                    'amount' => (float)$x[1],
+                    'price' => (float) $x[0],
+                    'amount' => (float) $x[1],
                 ]),
         ];
     }
