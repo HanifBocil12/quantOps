@@ -25,3 +25,11 @@ Route::get('/cron/run-schedule', function () {
 
     return response()->json(['status' => 'ok', 'output' => Artisan::output()]);
 });
+
+Route::get('/cron/clear-lock', function () {
+    if (request()->query('secret') !== config('services.cron.cron_secret')) {
+        abort(403);
+    }
+    \Illuminate\Support\Facades\Cache::flush();
+    return 'cleared';
+});
