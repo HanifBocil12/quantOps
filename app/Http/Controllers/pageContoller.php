@@ -60,10 +60,14 @@ class pageContoller extends Controller
         $markets = $this->binance->getMarketList();
         $coin = collect($markets)
             ->firstWhere('pair', $pair);
+        $order = $this->binance->getOrderBook($pair);
+
 
         return view('page.trade', [
             'pair' => $pair,
             'coin' => $coin,
+            'asks' => $order['asks'],
+            'bids' => $order['bids'],
         ]);
     }
 }

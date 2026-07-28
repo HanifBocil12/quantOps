@@ -66,112 +66,96 @@
 
             {{-- Order Book + Trades --}}
             <div class="col-span-2 flex flex-col gap-2">
+
+                {{-- Order Book --}}
                 <div
                     class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 h-[350px] overflow-hidden">
-                    <div class="text-sm font-semibold mb-2">Order Book</div>
-                    <div class="flex justify-between text-xs text-white/50 mb-1">
+
+                    <div class="text-sm font-semibold mb-2">
+                        Order Book
+                    </div>
+
+                    <div class="flex justify-between text-xs text-white/50 mb-2">
                         <span>Harga (USDT)</span>
-                        <span>Jumlah (USDT)</span>
-                    </div>
-                    <div class="flex flex-col gap-[2px] text-xs">
-                        @foreach ($asks ?? [] as $ask)
-                            <div class="flex justify-between text-red-500">
-                                <span>{{ number_format($ask['price'], 1) }}</span>
-                                <span>{{ $ask['amount'] }}</span>
-                            </div>
-                        @endforeach
+                        <span>Jumlah</span>
                     </div>
 
-                    <div class="text-lg font-bold text-green-500 my-2">
-                        {{ $lastPrice ?? '65.033,2' }} <i class="ph ph-arrow-up text-sm"></i>
-                    </div>
+                    {{-- SELL (ASKS) --}}
+                    <div class="space-y-1 h-[120px] overflow-y-auto">
 
-                    <div class="flex flex-col gap-[2px] text-xs">
-                        @foreach ($bids ?? [] as $bid)
-                            <div class="flex justify-between text-green-500">
-                                <span>{{ number_format($bid['price'], 1) }}</span>
-                                <span>{{ $bid['amount'] }}</span>
+                        @foreach ($asks as $ask)
+                            <div class="flex justify-between text-xs text-red-500">
+                                <span>{{ number_format($ask['price'], 2) }}</span>
+                                <span>{{ number_format($ask['amount'], 6) }}</span>
                             </div>
                         @endforeach
+
                     </div>
+
+                    {{-- Last Price --}}
+                    <div class="text-center py-2 border-y border-white/10 my-2">
+
+                        <div class="text-lg font-bold text-green-500">
+                            {{ number_format($coin['price'], 2) }}
+                        </div>
+
+                    </div>
+
+                    {{-- BUY (BIDS) --}}
+                    <div class="space-y-1 h-[120px] overflow-y-auto">
+
+                        @foreach ($bids as $bid)
+                            <div class="flex justify-between text-xs text-green-500">
+                                <span>{{ number_format($bid['price'], 2) }}</span>
+                                <span>{{ number_format($bid['amount'], 6) }}</span>
+                            </div>
+                        @endforeach
+
+                    </div>
+
                 </div>
 
+                {{-- Recent Trades --}}
                 <div
                     class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 flex-1 overflow-hidden">
-                    <div class="flex gap-4 text-sm mb-2">
-                        <span class="font-semibold border-b-2 border-blue-500 pb-1">Perdagangan</span>
-                        <span class="text-white/50">Top Mover</span>
+
+                    <div class="text-sm font-semibold mb-2">
+                        Recent Trades
                     </div>
-                    <div class="flex justify-between text-xs text-white/50 mb-1">
-                        <span>Harga (USDT)</span>
-                        <span>Jumlah (USDT)</span>
+
+                    <div class="flex justify-between text-xs text-white/50 mb-2">
+                        <span>Harga</span>
+                        <span>Qty</span>
                         <span>Waktu</span>
                     </div>
-                    <div class="flex flex-col gap-[2px] text-xs">
-                        @foreach ($trades ?? [] as $trade)
-                            <div
-                                class="flex justify-between {{ $trade['side'] === 'sell' ? 'text-red-500' : 'text-green-500' }}">
-                                <span>{{ number_format($trade['price'], 1) }}</span>
-                                <span>{{ $trade['amount'] }}</span>
-                                <span class="text-white/50">{{ $trade['time'] }}</span>
-                            </div>
-                        @endforeach
-                    </div>
+
+                    @forelse($trades ?? [] as $trade)
+                        <div
+                            class="flex justify-between text-xs {{ $trade['side'] == 'sell' ? 'text-red-500' : 'text-green-500' }}">
+                            <span>{{ number_format($trade['price'], 2) }}</span>
+                            <span>{{ number_format($trade['amount'], 6) }}</span>
+                            <span class="text-white/50">{{ $trade['time'] }}</span>
+                        </div>
+
+                    @empty
+
+                        <div class="text-center text-white/40 text-xs mt-5">
+                            Tidak ada data trade.
+                        </div>
+                    @endforelse
+
                 </div>
+
             </div>
 
             {{-- Trade Panel --}}
             <div
                 class="col-span-3 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
-                <div class="flex gap-2 mb-3">
-                    <button class="flex-1 btn btn-sm bg-blue-500 border-0 text-white">Buka</button>
-                    <button class="flex-1 btn btn-sm btn-ghost text-white/60">Tutup</button>
-                </div>
 
-                <div class="flex gap-4 text-sm mb-3 border-b border-line-new pb-2">
-                    <span class="text-white/50">Limit</span>
-                    <span class="font-semibold border-b-2 border-blue-500 pb-2 -mb-2">Pasar</span>
-                    <span class="text-white/50">Bersyarat <i class="ph ph-caret-down"></i></span>
-                </div>
+                {{-- isi panel trading milikmu tetap --}}
 
-                <div class="text-xs text-white/50 mb-1">Tersedia</div>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm">0,00 USDT</span>
-                    <i class="ph ph-arrows-clockwise text-white/40"></i>
-                </div>
-
-                <label class="text-xs text-white/50 mb-1 block">Jumlah</label>
-                <div class="flex items-center justify-between border border-line-new rounded px-3 py-2 mb-3">
-                    <span class="text-white/40 text-sm">USDT</span>
-                </div>
-
-                <label class="flex items-center gap-2 text-xs mb-3">
-                    <input type="checkbox" checked class="checkbox checkbox-xs">
-                    TP/SL
-                </label>
-
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <div>
-                        <label class="text-xs text-white/50 mb-1 block">Take Profit</label>
-                        <div class="border border-line-new rounded px-3 py-2 text-sm text-white/40">Harga</div>
-                    </div>
-                    <div>
-                        <label class="text-xs text-white/50 mb-1 block">Stop Loss</label>
-                        <div class="border border-line-new rounded px-3 py-2 text-sm text-white/40">Harga</div>
-                    </div>
-                </div>
-
-                <div class="flex gap-2">
-                    <button class="flex-1 btn bg-green-500 border-0 text-white">Buka long</button>
-                    <button class="flex-1 btn bg-red-500 border-0 text-white">Buka short</button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-y-1 text-xs text-white/50 mt-3">
-                    <span>Harga Lik.</span><span class="text-end text-white">-- USDT</span>
-                    <span>CostBiaya</span><span class="text-end text-white">0,00 USDT</span>
-                    <span>Maks</span><span class="text-end text-white">0,00 USDT</span>
-                </div>
             </div>
+
         </div>
 
         {{-- Bottom Tabs: Posisi / Order / dll --}}

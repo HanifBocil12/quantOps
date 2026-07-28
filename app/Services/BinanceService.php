@@ -86,6 +86,26 @@ class BinanceService
             ->toArray();
     }
 
+    public function getOrderBook(string $pair, int $limit = 20)
+    {
+        $data = Http::get('https://api.binance.com/api/v3/depth', [
+            'symbol' => strtoupper($pair),
+            'limit' => $limit,
+        ])->json();
+
+        return [
+            'asks' => collect($data['asks'] ?? [])->map(fn($ask) => [
+                'price' => (float) $ask[0],
+                'amount' => (float) $ask[1],
+            ])->values(),
+
+            'bids' => collect($data['bids'] ?? [])->map(fn($bid) => [
+                'price' => (float) $bid[0],
+                'amount' => (float) $bid[1],
+            ])->values(),
+        ];
+    }
+
     public function getPortfolio(): array
     {
         $account = $this->getAccountBalance();
