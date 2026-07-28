@@ -27,5 +27,6 @@ return [
         'key' => env('BINANCE_API_KEY'),
         'secret' => env('BINANCE_API_SECRET'),
         'base_url' => env('BINANCE_BASE_URL', 'https://api.binance.com'),
+        'futures_url' => env('BINANCE_FUTURES_URL'),
     ],
 ];

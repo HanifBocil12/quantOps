@@ -11,6 +11,7 @@ class BinanceService
     protected string $apiKey;
     protected string $apiSecret;
     protected string $baseUrl;
+    protected string $futuresUrl;
     protected string $proxy;
 
     public function __construct()
@@ -18,6 +19,7 @@ class BinanceService
         $this->apiKey = config('services.binance.key');
         $this->apiSecret = config('services.binance.secret');
         $this->baseUrl = config('services.binance.base_url');
+        $this->futuresUrl = config('services.binance.futures_url');
         $this->proxy = env('BINANCE_PROXY', '');
     }
 
@@ -88,24 +90,27 @@ class BinanceService
 
     public function getOrderBook(string $pair, int $limit = 20)
     {
-        $data = Http::get('https://api.binance.com/api/v3/depth', [
-            'symbol' => strtoupper($pair),
-            'limit' => $limit,
-        ])->json();
-        
-        dd($data);
+        $response = Http::get(
+            "{$this->futuresUrl}/fapi/v1/depth",
+            [
+                'symbol' => strtoupper($pair),
+                'limit' => $limit,
+            ]
+        );
+
+        $data = $response->json();
 
         return [
             'asks' => collect($data['asks'] ?? [])
-                ->map(fn($ask) => [
-                    'price' => (float) $ask[0],
-                    'amount' => (float) $ask[1],
+                ->map(fn($x) => [
+                    'price' => (float)$x[0],
+                    'amount' => (float)$x[1],
                 ]),
 
             'bids' => collect($data['bids'] ?? [])
-                ->map(fn($bid) => [
-                    'price' => (float) $bid[0],
-                    'amount' => (float) $bid[1],
+                ->map(fn($x) => [
+                    'price' => (float)$x[0],
+                    'amount' => (float)$x[1],
                 ]),
         ];
     }
