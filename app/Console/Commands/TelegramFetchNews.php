@@ -23,8 +23,7 @@ class TelegramFetchNews extends Command
         'cryptoquant_official',
         'whale_alert_io',
         'wublockchainenglish',
-        // 'lookonchain',
-        'intothecryptoverse_news',   // ← koreksi dari 'intothecryptoverse'
+        'intothecryptoverse_news',
     ];
 
     public function handle(): int
@@ -36,6 +35,7 @@ class TelegramFetchNews extends Command
         $MadelineProto->start();
 
         $allNews = [];
+        $debug = [];
 
         foreach ($this->channels as $channel) {
             try {
@@ -66,10 +66,9 @@ class TelegramFetchNews extends Command
                     ];
                 }
 
-                Log::info("Channel {$channel}: {$rawCount} raw messages, {$withText} with text");
+                $debug[$channel] = "OK: {$rawCount} raw, {$withText} with text";
             } catch (\Throwable $e) {
-                $this->error("Failed for {$channel}: " . $e->getMessage());
-                Log::warning("Telegram fetch failed for {$channel}: " . $e->getMessage());
+                $debug[$channel] = "ERROR: " . $e->getMessage();
                 continue;
             }
         }
@@ -77,6 +76,7 @@ class TelegramFetchNews extends Command
         usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
 
         Cache::put('telegram_news', $allNews, now()->addMinutes(10));
+        Cache::put('telegram_news_debug', $debug, now()->addMinutes(10));
 
         $this->info('Fetched ' . count($allNews) . ' messages, cached for 10 minutes.');
 
