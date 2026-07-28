@@ -75,7 +75,8 @@ class BinanceService
                 'pair'         => $t['symbol'],
                 'price'        => (float) $t['lastPrice'],
                 'change_pct'   => (float) $t['priceChangePercent'],
-                'volume_usdt'  => (float) $t['quoteVolume'],
+                'volume'      => (float) $t['volume'],        // Base asset volume (BTC, ETH, dll)
+                'volume_usdt' => (float) $t['quoteVolume'],   // USDT volume
                 'high'         => (float) $t['highPrice'],
                 'low'          => (float) $t['lowPrice'],
             ])
