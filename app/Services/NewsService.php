@@ -54,6 +54,20 @@ class NewsService
         ];
     }
 
+    public function getWorldNews(int $limit = 20): array
+    {
+        $allNews = array_merge(
+            $this->getRssNews(),
+            Cache::get('telegram_world_news', [])
+        );
+
+        $allNews = $this->filterNews($allNews);
+
+        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
+
+        return array_slice($allNews, 0, $limit);
+    }
+
     protected function categorizeNews(array $news): array
     {
         foreach ($news as &$item) {
@@ -150,8 +164,7 @@ class NewsService
     protected function categorizeGeneralNews(array $news): array
     {
         return [
-            'live' => [],      // sementara semua masuk live
-            'world' => [],        // TODO: isi nanti
+            'live' => [],        // TODO: isi nanti
             'markets' => [],      // TODO: isi nanti
         ];
     }

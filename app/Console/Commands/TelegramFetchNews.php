@@ -25,12 +25,42 @@ class TelegramFetchNews extends Command
         'intothecryptoverse_news',
     ];
 
+    protected array $channelsWorld = [
+        'ReutersWorld',
+        'BBCWorld',
+        'bloomberg',
+        'AJEnglish',
+        'dwnews',
+        'guardian',
+    ];
+
     public function handle(): int
     {
-        $allNews = [];
+        $cryptoNews = [];
+        $worldNews = [];
         $debug = [];
 
-        foreach ($this->channels as $channel) {
+        $this->fetchChannels($this->channels, $cryptoNews, $debug);
+        $this->fetchChannels($this->channelsWorld, $worldNews, $debug);
+
+        usort($cryptoNews, fn($a, $b) => $b['published'] - $a['published']);
+        usort($worldNews, fn($a, $b) => $b['published'] - $a['published']);
+
+        Cache::put('telegram_news', $cryptoNews, now()->addMinutes(10));
+        Cache::put('telegram_world_news', $worldNews, now()->addMinutes(10));
+        Cache::put('telegram_news_debug', $debug, now()->addMinutes(10));
+
+        $this->info(
+            'Crypto: ' . count($cryptoNews) .
+                ' | World: ' . count($worldNews)
+        );
+
+        return self::SUCCESS;
+    }
+
+    protected function fetchChannels(array $channels, array &$news, array &$debug): void
+    {
+        foreach ($channels as $channel) {
             try {
                 $response = Http::withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (compatible; QuantOpsBot/1.0)',
@@ -49,8 +79,9 @@ class TelegramFetchNews extends Command
                 $rawCount = $nodes->count();
                 $withText = 0;
 
-                $nodes->each(function (Crawler $node) use (&$allNews, &$withText, $channel) {
+                $nodes->each(function (Crawler $node) use (&$news, &$withText, $channel) {
                     $textNode = $node->filter('.tgme_widget_message_text');
+
                     if ($textNode->count() === 0) {
                         return;
                     }
@@ -68,15 +99,18 @@ class TelegramFetchNews extends Command
                     $msgId = $postAttr ? Str::afterLast($postAttr, '/') : null;
 
                     $dateNode = $node->filter('time');
-                    $datetime = $dateNode->count() > 0
+
+                    $datetime = $dateNode->count()
                         ? strtotime($dateNode->attr('datetime'))
                         : time();
 
-                    $allNews[] = [
+                    $news[] = [
                         'source'    => $channel,
                         'title'     => Str::limit($text, 120),
                         'text'      => $text,
-                        'url'       => $msgId ? "https://t.me/{$channel}/{$msgId}" : "https://t.me/s/{$channel}",
+                        'url'       => $msgId
+                            ? "https://t.me/{$channel}/{$msgId}"
+                            : "https://t.me/s/{$channel}",
                         'published' => $datetime,
                     ];
                 });
@@ -84,19 +118,10 @@ class TelegramFetchNews extends Command
                 $debug[$channel] = "OK: {$rawCount} raw, {$withText} with text";
             } catch (\Throwable $e) {
                 $debug[$channel] = "ERROR: " . $e->getMessage();
+
                 Log::error("Telegram scrape failed for {$channel}: " . $e->getMessage());
-                continue;
             }
         }
-
-        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
-
-        Cache::put('telegram_news', $allNews, now()->addMinutes(10));
-        Cache::put('telegram_news_debug', $debug, now()->addMinutes(10));
-
-        $this->info('Fetched ' . count($allNews) . ' messages, cached for 10 minutes.');
-
-        return self::SUCCESS;
     }
 
     protected function extractText(Crawler $textNode): string
@@ -110,18 +135,15 @@ class TelegramFetchNews extends Command
         $text = preg_replace('/[ \t\x{00A0}]+/u', ' ', $text);
         $text = preg_replace('/ *\n */', "\n", $text);
         $text = preg_replace('/\n{3,}/', "\n\n", $text);
-
-        // Heuristik: kalimat/segmen yang ke-nempel tanpa spasi (period langsung diikuti huruf kapital)
         $text = preg_replace('/([a-z0-9])\.([A-Z])/', '$1. $2', $text);
 
-        $text = trim($text);
-
-        return $text;
+        return trim($text);
     }
 
     protected function stripSponsoredTail(string $text): string
     {
-        // Buang segmen "Sponsored by X — link" / "Sponsored by X - link" di ekor teks
-        return trim(preg_replace('/\s*Sponsored by .+?(—|-)\s*link\s*$/iu', '', $text));
+        return trim(
+            preg_replace('/\s*Sponsored by .+?(—|-)\s*link\s*$/iu', '', $text)
+        );
     }
 }

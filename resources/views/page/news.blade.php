@@ -266,14 +266,23 @@
                 .then(r => r.json())
                 .then(news => {
                     renderNews(document.getElementById('live-news'), news.live);
-                    renderNews(document.getElementById('world-news'), news.world);
                     renderNews(document.getElementById('markets-news'), news.markets);
                 })
                 .catch(() => {
-                    ['live-news', 'world-news', 'markets-news'].forEach(id => {
+                    ['live-news', 'markets-news'].forEach(id => {
                         document.getElementById(id).innerHTML =
                             '<p class="text-xs text-base-content/40">Failed to load</p>';
                     });
+                });
+
+            fetch('{{ route('news.world') }}')
+                .then(r => r.json())
+                .then(news => {
+                    renderNews(document.getElementById('world-news'), news);
+                })
+                .catch(() => {
+                    document.getElementById('world-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
 
 
