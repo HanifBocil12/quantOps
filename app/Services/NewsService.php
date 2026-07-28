@@ -169,36 +169,36 @@ class NewsService
             [
                 'city' => 'London',
                 'region' => 'Europe',
-                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
+                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News (sering live)
             ],
             [
                 'city' => 'Frankfurt',
                 'region' => 'Europe',
-                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg', // DW News
+                'channel_id' => 'UCkI2PJgVjH3tq3nJ1V5z9Xw', // Reuters (sering live)
             ],
             [
                 'city' => 'Berlin',
                 'region' => 'Europe',
-                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg', // DW News
+                'channel_id' => 'UCkI2PJgVjH3tq3nJ1V5z9Xw', // Reuters
             ],
 
             // AMERICAS
             [
                 'city' => 'New York',
                 'region' => 'Americas',
-                'channel_id' => 'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
+                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN (24/7 live)
             ],
             [
                 'city' => 'Washington DC',
                 'region' => 'Americas',
-                'channel_id' => 'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
+                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN
             ],
 
             // ASIA
             [
                 'city' => 'Tokyo',
                 'region' => 'Asia',
-                'channel_id' => 'UC19xL2I6UMy8yQ6cP9F9tRg', // NHK World
+                'channel_id' => 'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News (sering live)
             ],
             [
                 'city' => 'Singapore',
@@ -230,6 +230,9 @@ class NewsService
         return collect($channels)
             ->map(function ($channel) {
                 $video = $this->searchYoutubeLive($channel['channel_id']);
+
+                // Log untuk debug
+                Log::info('Channel: ' . $channel['city'] . ' - Video found: ' . ($video ? 'YES' : 'NO'));
 
                 return [
                     'city' => $channel['city'],
