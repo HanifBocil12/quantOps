@@ -287,6 +287,10 @@ class NewsService
             ]
         );
 
+
+        logger($response->json());
+
+
         $data = $response->json();
 
         if (empty($data['items'])) {
