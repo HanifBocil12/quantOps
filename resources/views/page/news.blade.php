@@ -231,22 +231,27 @@
             }
 
             function renderCryptoNewsGrouped(el, grouped) {
-                const sections = [
-                    { key: 'onchain_alert', label: 'Onchain Alert' },
-                    { key: 'general', label: 'General News' },
+                const sections = [{
+                        key: 'onchain_alert',
+                        label: 'Onchain Alert'
+                    },
+                    {
+                        key: 'general',
+                        label: 'General News'
+                    },
                 ];
 
                 el.innerHTML = sections.map(section => {
                     const items = grouped[section.key] || [];
-                    const itemsHtml = items.length
-                        ? items.map(item => `
+                    const itemsHtml = items.length ?
+                        items.map(item => `
                             <a href="${item.url}" target="_blank"
                                class="block border-b border-base-300 pb-2 mb-2 hover:opacity-80 transition last:border-0">
                                 <p class="text-[9px] text-base-content/40 uppercase tracking-widest">${item.source}</p>
                                 <p class="text-xs text-base-content/80 leading-snug">${item.title}</p>
                             </a>
-                        `).join('')
-                        : '<p class="text-xs text-base-content/40">No news available</p>';
+                        `).join('') :
+                        '<p class="text-xs text-base-content/40">No news available</p>';
 
                     return `
                         <div class="mb-3">
@@ -260,9 +265,9 @@
             fetch('{{ route('news.index') }}')
                 .then(r => r.json())
                 .then(news => {
-                    renderNews(document.getElementById('live-news'), news);
-                    renderNews(document.getElementById('world-news'), news);
-                    renderNews(document.getElementById('markets-news'), news.slice(0, 5));
+                    renderNews(document.getElementById('live-news'), news.live);
+                    renderNews(document.getElementById('world-news'), news.world);
+                    renderNews(document.getElementById('markets-news'), news.markets);
                 })
                 .catch(() => {
                     ['live-news', 'world-news', 'markets-news'].forEach(id => {
@@ -270,6 +275,7 @@
                             '<p class="text-xs text-base-content/40">Failed to load</p>';
                     });
                 });
+
 
             fetch('{{ route('news.crypto') }}')
                 .then(r => r.json())

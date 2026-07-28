@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class NewsService
 {
-    protected array $rssFeeds = [
-
-    ];
+    protected array $rssFeeds = [];
 
     protected array $onchainAlertSources = [
         'whale_alert_io',
@@ -27,7 +25,9 @@ class NewsService
 
         usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
 
-        return array_slice($allNews, 0, $limit);
+        $allNews = array_slice($allNews, 0, $limit);
+
+        return $this->categorizeGeneralNews($allNews);
     }
 
     /**
@@ -145,5 +145,14 @@ class NewsService
         }
 
         return $allNews;
+    }
+
+    protected function categorizeGeneralNews(array $news): array
+    {
+        return [
+            'live' => $news,      // sementara semua masuk live
+            'world' => [],        // TODO: isi nanti
+            'markets' => [],      // TODO: isi nanti
+        ];
     }
 }
