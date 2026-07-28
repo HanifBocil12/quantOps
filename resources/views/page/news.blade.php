@@ -38,11 +38,12 @@
 
                 <div id="crypto-news" class="mt-2 space-y-3 flex-1 overflow-hidden">
 
-                    <div id="crypto-onchain" class="max-h-[140px] pr-1">
+                    <div id="crypto-onchain" class="max-h-[140px] overflow-y-auto pr-1">
                     </div>
 
-                    <div id="crypto-general" class="max-h-[140px] pr-1">
+                    <div id="crypto-general" class="max-h-[140px] overflow-y-auto pr-1">
                     </div>
+
 
                 </div>
 
