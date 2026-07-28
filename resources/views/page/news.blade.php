@@ -15,9 +15,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-100 shadow-sm border border-base-300">
+        <div class="card bg-base-100 shadow-sm border border-base-300 h-full overflow-hidden">
 
-            <div class="card-body p-4">
+            <div class="card-body p-4 overflow-hidden">
 
                 <h3 class="text-sm font-semibold text-base-content/70">
                     Live Webcams
@@ -58,7 +58,7 @@
                 </div>
 
 
-                <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 overflow-y-auto">
+                <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 max-h-[300px] overflow-y-auto pr-1">
 
                     <p class="text-xs text-base-content/40">
                         Loading webcams...
@@ -444,23 +444,23 @@
                 ?
 
                 `
-                                            <iframe
-                                                src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                class="w-full aspect-video"
-                                                frameborder="0"
-                                                allowfullscreen>
-                                            </iframe>
-                                            `
+                                                    <iframe
+                                                        src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                        class="w-full aspect-video"
+                                                        frameborder="0"
+                                                        allowfullscreen>
+                                                    </iframe>
+                                                    `
 
                 :
 
                 `
-                                            <div class="aspect-video flex items-center justify-center">
-                                                <span class="text-xs text-error">
-                                                    Offline
-                                                </span>
-                                            </div>
-                                            `
+                                                    <div class="aspect-video flex items-center justify-center">
+                                                        <span class="text-xs text-error">
+                                                            Offline
+                                                        </span>
+                                                    </div>
+                                                    `
 
             }
 
