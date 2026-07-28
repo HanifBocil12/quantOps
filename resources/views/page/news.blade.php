@@ -24,8 +24,7 @@
 
                 <div class="mt-2 flex-1 overflow-y-auto">
 
-                    <div id="live-news-video"
-                        class="aspect-video rounded overflow-hidden bg-black flex items-center justify-center">
+                    <div id="live-news-grid" class="grid grid-cols-1 gap-3">
 
                         <p class="text-xs text-base-content/40">
                             Loading live...
@@ -339,44 +338,27 @@
 
             fetch('{{ route('news.live') }}')
                 .then(r => r.json())
-                .then(data => {
+                .then(videos => {
 
-                    const container = document.getElementById('live-news-video');
+                    document.getElementById('live-news-grid').innerHTML =
+                        videos.map(video => `
 
+                    <div class="bg-black rounded overflow-hidden">
 
-                    if (!data.length || !data[0].video_id) {
+                        <div class="p-2 text-xs text-base-content/70">
+                            ${video.source} - ${video.region}
+                        </div>
 
-                        container.innerHTML = `
-                <p class="text-xs text-base-content/40">
-                    No live stream
-                </p>
-            `;
+                        <iframe
+                        src="https://www.youtube.com/embed/${video.video_id}"
+                        class="w-full aspect-video rounded"
+                        frameborder="0"
+                        allowfullscreen>
+                        </iframe>
 
-                        return;
-                    }
+                    </div>
 
-
-                    const videoId = data[0].video_id;
-
-
-                    container.innerHTML = `
-            <iframe
-                src="https://www.youtube.com/embed/${videoId}"
-                class="w-full h-full"
-                frameborder="0"
-                allow="autoplay; encrypted-media"
-                allowfullscreen>
-            </iframe>
-        `;
-
-                })
-                .catch(() => {
-
-                    document.getElementById('live-news-video').innerHTML = `
-            <p class="text-xs text-base-content/40">
-                Failed to load live
-            </p>
-        `;
+                `).join('');
 
                 });
         });

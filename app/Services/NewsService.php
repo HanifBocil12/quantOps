@@ -163,23 +163,66 @@ class NewsService
 
     public function getLiveNews(): array
     {
-        $video = $this->searchYoutubeLive(
-            'UCknLrEdhRCp1aegoMqRaCZg'
-        );
+        $channels = [
 
-        if (!$video) {
-            return [];
-        }
-
-        return [
             [
                 'source' => 'DW News',
-                'title' => $video['title'],
-                'video_id' => $video['videoId'],
-                'thumbnail' => $video['thumbnail'],
-                'status' => $video['status'],
-            ]
+                'channel_id' => 'UCknLrEdhRCp1aegoMqRaCZg',
+                'region' => 'Europe',
+            ],
+
+            [
+                'source' => 'CNBC',
+                'channel_id' => 'UCvJJ_dzjViJCoLf5uKUTwoA',
+                'region' => 'Americas',
+            ],
+
+            [
+                'source' => 'Bloomberg',
+                'channel_id' => 'UCIALMKvObZNtJ6AmdCLP7Lg',
+                'region' => 'Americas',
+            ],
+
+            [
+                'source' => 'CNA',
+                'channel_id' => 'UC83jt4dlz1Gjl58fzQrrKZg',
+                'region' => 'Asia',
+            ],
+
+            [
+                'source' => 'NHK World',
+                'channel_id' => 'UC7JQ0k9gJ2M9x2yP9fYz5xA',
+                'region' => 'Asia',
+            ],
+
         ];
+
+
+        $result = [];
+
+
+        foreach ($channels as $channel) {
+
+            $video = $this->searchYoutubeLive(
+                $channel['channel_id']
+            );
+
+
+            if ($video) {
+
+                $result[] = [
+                    'source' => $channel['source'],
+                    'region' => $channel['region'],
+                    'title' => $video['title'],
+                    'video_id' => $video['videoId'],
+                    'thumbnail' => $video['thumbnail'],
+                    'status' => $video['status'],
+                ];
+            }
+        }
+
+
+        return $result;
     }
 
 
