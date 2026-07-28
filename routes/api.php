@@ -11,4 +11,5 @@ Route::prefix('binance')->group(function () {
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'getNews'])->name('news.index');
+    Route::get('/crypto', [NewsController::class, 'getCryptoNews']) -> name('news.crypto');
 });

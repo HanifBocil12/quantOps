@@ -230,21 +230,55 @@
                 `).join('');
             }
 
+            function renderCryptoNewsGrouped(el, grouped) {
+                const sections = [
+                    { key: 'onchain_alert', label: 'Onchain Alert' },
+                    { key: 'general', label: 'General News' },
+                ];
+
+                el.innerHTML = sections.map(section => {
+                    const items = grouped[section.key] || [];
+                    const itemsHtml = items.length
+                        ? items.map(item => `
+                            <a href="${item.url}" target="_blank"
+                               class="block border-b border-base-300 pb-2 mb-2 hover:opacity-80 transition last:border-0">
+                                <p class="text-[9px] text-base-content/40 uppercase tracking-widest">${item.source}</p>
+                                <p class="text-xs text-base-content/80 leading-snug">${item.title}</p>
+                            </a>
+                        `).join('')
+                        : '<p class="text-xs text-base-content/40">No news available</p>';
+
+                    return `
+                        <div class="mb-3">
+                            <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">${section.label}</p>
+                            ${itemsHtml}
+                        </div>
+                    `;
+                }).join('');
+            }
+
             fetch('{{ route('news.index') }}')
                 .then(r => r.json())
                 .then(news => {
                     renderNews(document.getElementById('live-news'), news);
-                    renderNews(document.getElementById('crypto-news'), news.filter(n => n.source?.toLowerCase()
-                        .includes('crypto')));
-                    renderNews(document.getElementById('world-news'), news.filter(n => !n.source?.toLowerCase()
-                        .includes('crypto')));
+                    renderNews(document.getElementById('world-news'), news);
                     renderNews(document.getElementById('markets-news'), news.slice(0, 5));
                 })
                 .catch(() => {
-                    ['live-news', 'crypto-news', 'world-news', 'markets-news'].forEach(id => {
+                    ['live-news', 'world-news', 'markets-news'].forEach(id => {
                         document.getElementById(id).innerHTML =
                             '<p class="text-xs text-base-content/40">Failed to load</p>';
                     });
+                });
+
+            fetch('{{ route('news.crypto') }}')
+                .then(r => r.json())
+                .then(grouped => {
+                    renderCryptoNewsGrouped(document.getElementById('crypto-news'), grouped);
+                })
+                .catch(() => {
+                    document.getElementById('crypto-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
         });
     </script>

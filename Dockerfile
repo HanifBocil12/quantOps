@@ -22,7 +22,6 @@ ENV CREATE_LARAVEL_STORAGE="1"
 
 RUN cd /var/www/html \
     && composer install --no-dev --optimize-autoloader \
-    && composer require symfony/dom-crawler symfony/css-selector \
     && php artisan config:clear \
     && php artisan route:clear \
     && php artisan view:clear \

@@ -12,5 +12,9 @@ class NewsController extends Controller
     {
         return response()->json($this->newsService->getNews(limit: 20));
     }
-    
+
+    public function getCryptoNews()
+    {
+        return response()->json($this->newsService->getCryptoNewsGrouped(limitPerGroup: 10));
+    }
 }
