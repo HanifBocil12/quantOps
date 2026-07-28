@@ -230,13 +230,14 @@ class NewsService
         return collect($channels)
             ->map(function ($channel) {
                 $video = $this->searchYoutubeLive($channel['channel_id']);
+
                 return [
                     'city' => $channel['city'],
                     'region' => $channel['region'],
-                    'title' => $video['title'] ?? 'Offline',
-                    'video_id' => $video['videoId'] ?? null,
-                    'thumbnail' => $video['thumbnail'] ?? null,
-                    'status' => $video['status'] ?? 'offline',
+                    'title' => $video ? $video['title'] : 'Offline',
+                    'video_id' => $video ? $video['videoId'] : null,
+                    'thumbnail' => $video ? $video['thumbnail'] : null,
+                    'status' => $video ? $video['status'] : 'offline',
                 ];
             })
             ->values()
@@ -258,8 +259,20 @@ class NewsService
             ]
         );
 
+        $data = $response->json();
 
-        dd($response->json());
+        if (empty($data['items'])) {
+            return null;
+        }
+
+        $item = $data['items'][0];
+
+        return [
+            'videoId' => $item['id']['videoId'],
+            'title' => $item['snippet']['title'],
+            'thumbnail' => $item['snippet']['thumbnails']['high']['url'] ?? null,
+            'status' => 'live',
+        ];
     }
     protected function categorizeGeneralNews(array $news): array
     {
