@@ -150,7 +150,7 @@ class NewsService
     protected function categorizeGeneralNews(array $news): array
     {
         return [
-            'live' => $news,      // sementara semua masuk live
+            'live' => [],      // sementara semua masuk live
             'world' => [],        // TODO: isi nanti
             'markets' => [],      // TODO: isi nanti
         ];
