@@ -163,88 +163,128 @@ class NewsService
 
     public function getLiveWebcams(): array
     {
-        $channels = [
+        // Definisikan multiple channel per kota
+        $cityChannels = [
 
             // EUROPE
-            [
-                'city' => 'London',
+            'London' => [
                 'region' => 'Europe',
-                'channel_id' => 'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News (24/7 live)
+                'channels' => [
+                    'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
+                ]
             ],
-            [
-                'city' => 'Frankfurt',
+            'Frankfurt' => [
                 'region' => 'Europe',
-                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN (24/7 live)
+                'channels' => [
+                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                    'UCknLrEdhRCp1aegoMqRaCZg', // DW News
+                ]
             ],
-            [
-                'city' => 'Berlin',
+            'Berlin' => [
                 'region' => 'Europe',
-                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                'channels' => [
+                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCknLrEdhRCp1aegoMqRaCZg', // DW News
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                ]
             ],
 
             // AMERICAS
-            [
-                'city' => 'New York',
+            'New York' => [
                 'region' => 'Americas',
-                'channel_id' => 'UCupvZG-5ko_eiXAupbDfxWw', // CNN (24/7 live)
+                'channels' => [
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                    'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
+                    'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
+                    'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
+                ]
             ],
-            [
-                'city' => 'Washington DC',
+            'Washington DC' => [
                 'region' => 'Americas',
-                'channel_id' => 'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News (sering live)
+                'channels' => [
+                    'UCBi2mrWuNuyYy4gbM6fU18Q', // ABC News
+                    'UCeY0bbntWzzVIaj2z3QigXg', // NBC News
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                ]
             ],
 
             // ASIA
-            [
-                'city' => 'Tokyo',
+            'Tokyo' => [
                 'region' => 'Asia',
-                'channel_id' => 'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News (sering live)
+                'channels' => [
+                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
+                    'UC19xL2I6UMy8yQ6cP9F9tRg', // NHK World
+                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                ]
             ],
-            [
-                'city' => 'Singapore',
+            'Singapore' => [
                 'region' => 'Asia',
-                'channel_id' => 'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA (sering live)
+                'channels' => [
+                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
+                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
+                ]
             ],
-            [
-                'city' => 'Hong Kong',
+            'Hong Kong' => [
                 'region' => 'Asia',
-                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera (sering live)
+                'channels' => [
+                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
+                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
+                ]
             ],
 
             // MIDDLE EAST
-            [
-                'city' => 'Dubai',
+            'Dubai' => [
                 'region' => 'Middle East',
-                'channel_id' => 'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
+                'channels' => [
+                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
+                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCupvZG-5ko_eiXAupbDfxWw', // CNN
+                ]
             ],
 
             // SPACE
-            [
-                'city' => 'ISS Live',
+            'ISS Live' => [
                 'region' => 'Space',
-                'channel_id' => 'UCRuCgmzhczsm89jzPtN2Wuw', // NASA (sering live)
+                'channels' => [
+                    'UCRuCgmzhczsm89jzPtN2Wuw', // NASA
+                    'UCRuCgmzhczsm89jzPtN2Wuw', // NASA (cuma 1)
+                ]
             ],
 
         ];
 
-        return collect($channels)
-            ->map(function ($channel) {
-                $video = $this->searchYoutubeLive($channel['channel_id']);
+        $result = [];
 
-                // Logging
-                logger('Channel: ' . $channel['city'] . ' - Video: ' . ($video ? 'YES - ' . $video['title'] : 'NO'));
+        foreach ($cityChannels as $city => $config) {
+            $video = null;
 
-                return [
-                    'city' => $channel['city'],
-                    'region' => $channel['region'],
-                    'title' => $video ? $video['title'] : 'Offline',
-                    'video_id' => $video ? $video['videoId'] : null,
-                    'thumbnail' => $video ? $video['thumbnail'] : null,
-                    'status' => $video ? $video['status'] : 'offline',
-                ];
-            })
-            ->values()
-            ->toArray();
+            // Coba semua channel untuk kota ini
+            foreach ($config['channels'] as $channelId) {
+                $video = $this->searchYoutubeLive($channelId);
+
+                if ($video) {
+                    logger('Found live for ' . $city . ' from channel: ' . $channelId);
+                    break; // Berhenti kalo udah ketemu
+                }
+            }
+
+            $result[] = [
+                'city' => $city,
+                'region' => $config['region'],
+                'title' => $video ? $video['title'] : 'Offline',
+                'video_id' => $video ? $video['videoId'] : null,
+                'thumbnail' => $video ? $video['thumbnail'] : null,
+                'status' => $video ? $video['status'] : 'offline',
+            ];
+        }
+
+        return $result;
     }
 
 
@@ -277,6 +317,7 @@ class NewsService
             'status' => 'live',
         ];
     }
+    
     protected function categorizeGeneralNews(array $news): array
     {
         return [
