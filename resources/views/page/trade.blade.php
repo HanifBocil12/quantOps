@@ -56,103 +56,124 @@
             </div>
         </div>
 
-        {{-- Main Grid: Chart | Order Book | Trade Panel --}}
-        <div class="grid grid-cols-12 gap-2">
+        {{-- Trade Panel --}}
+        <div
+            class="col-span-3 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
 
-            {{-- Chart --}}
-            <div class="col-span-7 border border-line-new bg-black/40 h-[600px]">
-                <div id="tv_chart_container" class="w-full h-full"></div>
+            <div class="flex gap-2 mb-3">
+                <button class="flex-1 btn btn-sm bg-blue-500 border-0 text-white">
+                    Buka
+                </button>
+
+                <button class="flex-1 btn btn-sm btn-ghost text-white/60">
+                    Tutup
+                </button>
             </div>
 
-            {{-- Order Book + Trades --}}
-            <div class="col-span-2 flex flex-col gap-2">
 
-                {{-- Order Book --}}
-                <div
-                    class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 h-[350px] overflow-hidden">
+            <div class="flex gap-4 text-sm mb-3 border-b border-line-new pb-2">
 
-                    <div class="text-sm font-semibold mb-2">
-                        Order Book
+                <span class="text-white/50">
+                    Limit
+                </span>
+
+                <span class="font-semibold border-b-2 border-blue-500 pb-2 -mb-2">
+                    Pasar
+                </span>
+
+                <span class="text-white/50">
+                    Bersyarat
+                    <i class="ph ph-caret-down"></i>
+                </span>
+
+            </div>
+
+
+            <div class="text-xs text-white/50 mb-1">
+                Tersedia
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm">
+                    0,00 USDT
+                </span>
+
+                <i class="ph ph-arrows-clockwise text-white/40"></i>
+            </div>
+
+
+            <label class="text-xs text-white/50 mb-1 block">
+                Jumlah
+            </label>
+
+            <div class="flex items-center justify-between border border-line-new rounded px-3 py-2 mb-3">
+                <span class="text-white/40 text-sm">
+                    USDT
+                </span>
+            </div>
+
+
+            <label class="flex items-center gap-2 text-xs mb-3">
+                <input type="checkbox" checked class="checkbox checkbox-xs">
+                TP/SL
+            </label>
+
+
+            <div class="grid grid-cols-2 gap-2 mb-3">
+
+                <div>
+                    <label class="text-xs text-white/50 mb-1 block">
+                        Take Profit
+                    </label>
+
+                    <div class="border border-line-new rounded px-3 py-2 text-sm text-white/40">
+                        Harga
                     </div>
-
-                    <div class="flex justify-between text-xs text-white/50 mb-2">
-                        <span>Harga (USDT)</span>
-                        <span>Jumlah</span>
-                    </div>
-
-                    {{-- SELL (ASKS) --}}
-                    <div class="space-y-1 h-[120px] overflow-y-auto">
-
-                        @foreach ($asks as $ask)
-                            <div class="flex justify-between text-xs text-red-500">
-                                <span>{{ number_format($ask['price'], 2) }}</span>
-                                <span>{{ number_format($ask['amount'], 6) }}</span>
-                            </div>
-                        @endforeach
-
-                    </div>
-
-                    {{-- Last Price --}}
-                    <div class="text-center py-2 border-y border-white/10 my-2">
-
-                        <div class="text-lg font-bold text-green-500">
-                            {{ number_format($coin['price'], 2) }}
-                        </div>
-
-                    </div>
-
-                    {{-- BUY (BIDS) --}}
-                    <div class="space-y-1 h-[120px] overflow-y-auto">
-
-                        @foreach ($bids as $bid)
-                            <div class="flex justify-between text-xs text-green-500">
-                                <span>{{ number_format($bid['price'], 2) }}</span>
-                                <span>{{ number_format($bid['amount'], 6) }}</span>
-                            </div>
-                        @endforeach
-
-                    </div>
-
                 </div>
 
-                {{-- Recent Trades --}}
-                <div
-                    class="border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-2 flex-1 overflow-hidden">
 
-                    <div class="text-sm font-semibold mb-2">
-                        Recent Trades
+                <div>
+                    <label class="text-xs text-white/50 mb-1 block">
+                        Stop Loss
+                    </label>
+
+                    <div class="border border-line-new rounded px-3 py-2 text-sm text-white/40">
+                        Harga
                     </div>
-
-                    <div class="flex justify-between text-xs text-white/50 mb-2">
-                        <span>Harga</span>
-                        <span>Qty</span>
-                        <span>Waktu</span>
-                    </div>
-
-                    @forelse($trades ?? [] as $trade)
-                        <div
-                            class="flex justify-between text-xs {{ $trade['side'] == 'sell' ? 'text-red-500' : 'text-green-500' }}">
-                            <span>{{ number_format($trade['price'], 2) }}</span>
-                            <span>{{ number_format($trade['amount'], 6) }}</span>
-                            <span class="text-white/50">{{ $trade['time'] }}</span>
-                        </div>
-
-                    @empty
-
-                        <div class="text-center text-white/40 text-xs mt-5">
-                            Tidak ada data trade.
-                        </div>
-                    @endforelse
-
                 </div>
 
             </div>
 
-            {{-- Trade Panel --}}
-            <div
-                class="col-span-3 border border-line-new bg-linear-[150deg] from-[#FFFFFF]/2 from-[24%] via-[#BECEFE]/16 via-[74%] to-[#AFC3FE]/20 to-[96%] p-3">
 
-                {{-- isi panel trading milikmu tetap --}}
+            <div class="flex gap-2">
+
+                <button class="flex-1 btn bg-green-500 border-0 text-white">
+                    Buka long
+                </button>
+
+                <button class="flex-1 btn bg-red-500 border-0 text-white">
+                    Buka short
+                </button>
+
+            </div>
+
+
+            <div class="grid grid-cols-2 gap-y-1 text-xs text-white/50 mt-3">
+
+                <span>Harga Lik.</span>
+                <span class="text-end text-white">
+                    -- USDT
+                </span>
+
+                <span>CostBiaya</span>
+                <span class="text-end text-white">
+                    0,00 USDT
+                </span>
+
+                <span>Maks</span>
+                <span class="text-end text-white">
+                    0,00 USDT
+                </span>
 
             </div>
 
