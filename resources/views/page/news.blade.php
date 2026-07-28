@@ -51,9 +51,12 @@
         </div>
 
         <div class="card bg-base-200 border border-base-300 h-full w-full">
-            <div class="card-body p-4 h-full w-full">
-                <h3 class="text-sm font-semibold text-base-content/70">World news</h3>
-                <div id="world-news" class="mt-2 space-y-2 flex-1 overflow-y-auto">
+            <div class="card-body p-4 h-full w-full overflow-hidden">
+                <h3 class="text-sm font-semibold text-base-content/70">
+                    World news
+                </h3>
+
+                <div id="world-news" class="mt-2 space-y-2 flex-1 overflow-y-auto max-h-[300px] pr-1">
                     <div class="animate-pulse flex space-x-2">
                         <div class="flex-1 space-y-2">
                             <div class="h-2 bg-base-300 rounded"></div>
@@ -61,6 +64,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
