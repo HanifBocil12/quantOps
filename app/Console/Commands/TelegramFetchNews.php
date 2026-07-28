@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Logger;
 
 class TelegramFetchNews extends Command
@@ -30,6 +31,29 @@ class TelegramFetchNews extends Command
     {
         $settings = new Settings;
         $settings->getLogger()->setLevel(Logger::LEVEL_WARNING);
+
+        // --- Proxy config (Webshare SOCKS5) ---
+        $proxyHost = config('services.telegram_proxy.host');
+        $proxyPort = config('services.telegram_proxy.port');
+        $proxyUser = config('services.telegram_proxy.user');
+        $proxyPass = config('services.telegram_proxy.pass');
+
+        if ($proxyHost && $proxyPort) {
+            $connection = new Connection;
+            $connection->setProxies([
+                [
+                    'proxy' => \danog\MadelineProto\Connection::SOCKS5_PROXY,
+                    'extra' => [
+                        'address'  => $proxyHost,
+                        'port'     => (int) $proxyPort,
+                        'username' => $proxyUser,
+                        'password' => $proxyPass,
+                    ],
+                ],
+            ]);
+            $settings->setConnection($connection);
+        }
+        // --- End proxy config ---
 
         $MadelineProto = new API(base_path('session.madeline'), $settings);
         $MadelineProto->start();

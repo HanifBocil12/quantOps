@@ -35,4 +35,10 @@ return [
     'telegram' => [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
     ],
+    'telegram_proxy' => [
+        'host' => env('TELEGRAM_PROXY_HOST'),
+        'port' => env('TELEGRAM_PROXY_PORT'),
+        'user' => env('TELEGRAM_PROXY_USER'),
+        'pass' => env('TELEGRAM_PROXY_PASS'),
+    ],
 ];
