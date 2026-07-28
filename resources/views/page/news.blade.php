@@ -31,15 +31,21 @@
 
         <div class="card bg-base-200 border border-base-300 h-full w-full">
             <div class="card-body p-4 h-full w-full">
-                <h3 class="text-sm font-semibold text-base-content/70">Crypto news</h3>
-                <div id="crypto-news" class="mt-2 space-y-2 flex-1 overflow-y-auto">
-                    <div class="animate-pulse flex space-x-2">
-                        <div class="flex-1 space-y-2">
-                            <div class="h-2 bg-base-300 rounded"></div>
-                            <div class="h-2 bg-base-300 rounded w-3/4"></div>
-                        </div>
+
+                <h3 class="text-sm font-semibold text-base-content/70">
+                    Crypto news
+                </h3>
+
+                <div id="crypto-news" class="mt-2 space-y-3 flex-1 overflow-hidden">
+
+                    <div id="crypto-onchain" class="max-h-[140px] overflow-y-auto pr-1">
                     </div>
+
+                    <div id="crypto-general" class="max-h-[140px] overflow-y-auto pr-1">
+                    </div>
+
                 </div>
+
             </div>
         </div>
 
@@ -230,36 +236,47 @@
                 `).join('');
             }
 
-            function renderCryptoNewsGrouped(el, grouped) {
-                const sections = [{
-                        key: 'onchain_alert',
-                        label: 'Onchain Alert'
-                    },
-                    {
-                        key: 'general',
-                        label: 'General News'
-                    },
-                ];
+            function renderCryptoNewsGrouped(grouped) {
 
-                el.innerHTML = sections.map(section => {
-                    const items = grouped[section.key] || [];
+                const renderSection = (el, label, items) => {
+
                     const itemsHtml = items.length ?
                         items.map(item => `
-                            <a href="${item.url}" target="_blank"
-                               class="block border-b border-base-300 pb-2 mb-2 hover:opacity-80 transition last:border-0">
-                                <p class="text-[9px] text-base-content/40 uppercase tracking-widest">${item.source}</p>
-                                <p class="text-xs text-base-content/80 leading-snug">${item.title}</p>
-                            </a>
-                        `).join('') :
+                        <a href="${item.url}" target="_blank"
+                        class="block border-b border-base-300 pb-2 mb-2 hover:opacity-80 transition">
+                            <p class="text-[9px] text-base-content/40 uppercase tracking-widest">
+                                ${item.source}
+                            </p>
+                            <p class="text-xs text-base-content/80 leading-snug">
+                                ${item.title}
+                            </p>
+                        </a>
+                    `).join('') :
                         '<p class="text-xs text-base-content/40">No news available</p>';
 
-                    return `
-                        <div class="mb-3">
-                            <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">${section.label}</p>
-                            ${itemsHtml}
-                        </div>
-                    `;
-                }).join('');
+
+                    el.innerHTML = `
+                    <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">
+                        ${label}
+                    </p>
+
+                    ${itemsHtml}
+                `;
+                };
+
+
+                renderSection(
+                    document.getElementById('crypto-onchain'),
+                    'Onchain Alert',
+                    grouped.onchain_alert || []
+                );
+
+
+                renderSection(
+                    document.getElementById('crypto-general'),
+                    'General News',
+                    grouped.general || []
+                );
             }
 
             function renderOnchainData(el, items) {
@@ -293,28 +310,16 @@
                 .then(r => r.json())
                 .then(grouped => {
 
-                    // Crypto News (tetap dua section)
-                    renderCryptoNewsGrouped(
-                        document.getElementById('crypto-news'),
-                        grouped
-                    );
+                    // Crypto News
+                    renderCryptoNewsGrouped(grouped);
 
-                    // Onchain Data (hanya Whale Alert)
+                    // Onchain Data card bawah
                     renderOnchainData(
                         document.getElementById('onchain-data'),
-                        grouped.onchain_alert
+                        grouped.onchain_alert || []
                     );
 
                 })
-                .catch(() => {
-
-                    document.getElementById('crypto-news').innerHTML =
-                        '<p class="text-xs text-base-content/40">Failed to load</p>';
-
-                    document.getElementById('onchain-data').innerHTML =
-                        '<p class="text-xs text-base-content/40">Failed to load</p>';
-
-                });
         });
     </script>
 </x-layout.app>
