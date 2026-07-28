@@ -30,7 +30,11 @@ Route::get('/cron/check-cache', function () {
     if (request()->query('secret') !== config('services.cron.cron_secret')) {
         abort(403);
     }
+
     return response()->json([
         'telegram_news' => \Illuminate\Support\Facades\Cache::get('telegram_news', 'EMPTY_OR_NOT_SET'),
+        'session_exists' => file_exists(base_path('session.madeline')),
+        'session_is_dir' => is_dir(base_path('session.madeline')),
+        'session_writable' => is_writable(base_path()),
     ]);
 });
