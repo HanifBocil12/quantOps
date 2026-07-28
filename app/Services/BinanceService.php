@@ -92,6 +92,8 @@ class BinanceService
             'symbol' => strtoupper($pair),
             'limit' => $limit,
         ])->json();
+        
+        dd($data);
 
         return [
             'asks' => collect($data['asks'] ?? [])
