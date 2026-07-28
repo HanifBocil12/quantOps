@@ -26,27 +26,32 @@
 
                 <div class="tabs tabs-boxed mt-2">
 
-                    <button class="tab tab-active" onclick="filterWebcams('ALL')">
+                    <button class="tab tab-active webcam-tab" data-region="ALL" onclick="filterWebcams('ALL')">
                         ALL
                     </button>
 
-                    <button class="tab" onclick="filterWebcams('Europe')">
+
+                    <button class="tab webcam-tab" data-region="Europe" onclick="filterWebcams('Europe')">
                         Europe
                     </button>
 
-                    <button class="tab" onclick="filterWebcams('Americas')">
+
+                    <button class="tab webcam-tab" data-region="Americas" onclick="filterWebcams('Americas')">
                         Americas
                     </button>
 
-                    <button class="tab" onclick="filterWebcams('Asia')">
+
+                    <button class="tab webcam-tab" data-region="Asia" onclick="filterWebcams('Asia')">
                         Asia
                     </button>
 
-                    <button class="tab" onclick="filterWebcams('Middle East')">
+
+                    <button class="tab webcam-tab" data-region="Middle East" onclick="filterWebcams('Middle East')">
                         Middle East
                     </button>
 
-                    <button class="tab" onclick="filterWebcams('Space')">
+
+                    <button class="tab webcam-tab" data-region="Space" onclick="filterWebcams('Space')">
                         Space
                     </button>
 
@@ -381,6 +386,18 @@
 
             function filterWebcams(region) {
                 renderWebcams(region);
+
+
+                document.querySelectorAll('.webcam-tab')
+                    .forEach(tab => {
+
+                        tab.classList.remove('tab-active');
+
+                        if (tab.dataset.region === region) {
+                            tab.classList.add('tab-active');
+                        }
+
+                    });
             }
 
 
@@ -395,56 +412,48 @@
 
 
                 document.getElementById('webcam-grid').innerHTML =
-                    filtered.map(webcam => {
+                    filtered.map(webcam => `
 
+                    <div class="bg-base-200 rounded-lg overflow-hidden">
 
-                        if (!webcam.video_id) {
-
-                            return `
-
-                                <div class="bg-base-200 rounded-lg p-3">
-
-                                    <div class="text-sm font-semibold">
-                                        ${webcam.city}
-                                    </div>
-
-                                    <div class="text-xs text-error">
-                                        Offline
-                                    </div>
-
-                                </div>
-
-                                `;
-
-                        }
-
-
-                        return `
-
-                    <div class="bg-black rounded-lg overflow-hidden">
-
-                        <div class="p-2 text-xs text-white">
+                        <div class="p-2 text-xs font-semibold">
                             ${webcam.city}
+
                             <span class="opacity-50">
                                 ${webcam.region}
                             </span>
                         </div>
 
 
-                        <iframe
-                            src="https://www.youtube.com/embed/${webcam.video_id}"
-                            class="w-full aspect-video"
-                            frameborder="0"
-                            allowfullscreen>
-                        </iframe>
+            ${
+                webcam.video_id
 
+                ?
 
-                    </div>
+                `
+                            <iframe
+                                src="https://www.youtube.com/embed/${webcam.video_id}"
+                                class="w-full aspect-video"
+                                frameborder="0"
+                                allowfullscreen>
+                            </iframe>
+                            `
 
-                    `;
+                :
 
+                `
+                            <div class="aspect-video flex items-center justify-center">
+                                <span class="text-xs text-error">
+                                    Offline
+                                </span>
+                            </div>
+                            `
 
-                    }).join('');
+            }
+
+        </div>
+
+    `).join('');
 
             }
         });

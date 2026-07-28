@@ -256,7 +256,7 @@ class NewsService
 
     protected function searchYoutubeLive(string $channelId): ?array
     {
-        $response = Http::timeout(5)->get(
+        $response = Http::get(
             'https://www.googleapis.com/youtube/v3/search',
             [
                 'key' => env('YOUTUBE_API_KEY'),
@@ -269,21 +269,7 @@ class NewsService
         );
 
 
-        $item = $response->json('items.0');
-
-
-        if (!$item) {
-            return null;
-        }
-
-
-        return [
-            'videoId' => $item['id']['videoId'],
-            'title' => $item['snippet']['title'],
-            'thumbnail' => $item['snippet']['thumbnails']['high']['url']
-                ?? null,
-            'status' => $item['snippet']['liveBroadcastContent'],
-        ];
+        dd($response->json());
     }
     protected function categorizeGeneralNews(array $news): array
     {
