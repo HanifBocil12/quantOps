@@ -17,15 +17,21 @@
         {{-- Row 1 --}}
         <div class="card bg-base-200 border border-base-300 h-full w-full">
             <div class="card-body p-4 h-full w-full">
-                <h3 class="text-sm font-semibold text-base-content/70">Live news</h3>
-                <div id="live-news" class="mt-2 space-y-2 flex-1 overflow-y-auto">
-                    <div class="animate-pulse flex space-x-2">
-                        <div class="flex-1 space-y-2">
-                            <div class="h-2 bg-base-300 rounded"></div>
-                            <div class="h-2 bg-base-300 rounded w-3/4"></div>
-                        </div>
+
+                <h3 class="text-sm font-semibold text-base-content/70">
+                    Live news
+                </h3>
+
+                <div class="mt-2 flex-1 overflow-y-auto">
+
+                    <div class="aspect-video rounded overflow-hidden bg-black">
+                        <iframe src="https://www.youtube.com/embed/qMtcWqCL_UQ" class="w-full h-full" frameborder="0"
+                            allow="autoplay; encrypted-media" allowfullscreen>
+                        </iframe>
                     </div>
+
                 </div>
+
             </div>
         </div>
 
