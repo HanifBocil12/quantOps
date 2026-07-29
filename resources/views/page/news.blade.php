@@ -137,22 +137,22 @@
             </div>
         </div>
 
-        {{-- Row 3 - Market Stats (full width): ETH gas, BTC index, funding avg, BTC dominance --}}
+        {{-- Row 3 - Komoditas (full width) --}}
         <div class="card border border-line-new lg:col-span-4 h-[200px] w-full">
             <div class="card-body p-4 h-full w-full">
-                <h3 class="text-sm font-semibold text-base-content/70 mb-3">Market Stats</h3>
+                <h3 class="text-sm font-semibold text-base-content/70 mb-3">Komoditas</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full">
-                    <div id="stat-gas" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
-                        <div class="text-xs text-base-content/40">Loading...</div>
+                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
+                        <div class="text-xs text-base-content/70">Live news</div>
                     </div>
-                    <div id="stat-index" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
-                        <div class="text-xs text-base-content/40">Loading...</div>
+                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
+                        <div class="text-xs text-base-content/70">Crypto news</div>
                     </div>
-                    <div id="stat-funding" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
-                        <div class="text-xs text-base-content/40">Loading...</div>
+                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
+                        <div class="text-xs text-base-content/70">World news</div>
                     </div>
-                    <div id="stat-global" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
-                        <div class="text-xs text-base-content/40">Loading...</div>
+                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
+                        <div class="text-xs text-base-content/70">Markets</div>
                     </div>
                 </div>
             </div>
@@ -335,9 +335,9 @@
                     const changeSign = isUp ? '+' : '';
 
                     const funding = fundingRates[item.symbol];
-                    const fundingHtml = (funding !== null && funding !== undefined)
-                        ? `<span class="text-[9px] text-base-content/40 font-mono">fund ${(funding * 100).toFixed(3)}%</span>`
-                        : '';
+                    const fundingHtml = (funding !== null && funding !== undefined) ?
+                        `<span class="text-[9px] text-base-content/40 font-mono">fund ${(funding * 100).toFixed(3)}%</span>` :
+                        '';
 
                     return `
                         <div class="flex items-center justify-between py-2.5 border-b border-base-300 last:border-0 hover:bg-base-300/30 transition rounded px-1 -mx-1">
@@ -370,11 +370,11 @@
                 el.innerHTML = `
                     <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Chain TVL</p>
                     ${items.map(item => `
-                        <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
-                            <span class="text-xs text-base-content/80">${item.name}</span>
-                            <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
-                        </div>
-                    `).join('')}
+                            <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
+                                <span class="text-xs text-base-content/80">${item.name}</span>
+                                <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
+                            </div>
+                        `).join('')}
                 `;
             }
 
@@ -386,35 +386,35 @@
 
                 if (gasEl) {
                     const gas = data.gas || {};
-                    gasEl.innerHTML = gas.propose_gwei
-                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">ETH Gas</div>
-                           <div class="text-lg font-mono">${gas.propose_gwei} <span class="text-xs">gwei</span></div>`
-                        : '<div class="text-xs text-base-content/40">No data</div>';
+                    gasEl.innerHTML = gas.propose_gwei ?
+                        `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">ETH Gas</div>
+                           <div class="text-lg font-mono">${gas.propose_gwei} <span class="text-xs">gwei</span></div>` :
+                        '<div class="text-xs text-base-content/40">No data</div>';
                 }
 
                 if (indexEl) {
                     const btc = (data.index || []).find(i => i.index === 'BTC_USD');
-                    indexEl.innerHTML = btc
-                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Index</div>
-                           <div class="text-lg font-mono">$${Number(btc.price).toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>`
-                        : '<div class="text-xs text-base-content/40">No data</div>';
+                    indexEl.innerHTML = btc ?
+                        `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Index</div>
+                           <div class="text-lg font-mono">$${Number(btc.price).toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>` :
+                        '<div class="text-xs text-base-content/40">No data</div>';
                 }
 
                 if (fundingEl) {
                     const avg = data.funding_avg;
                     const color = avg >= 0 ? 'text-green-500' : 'text-red-500';
-                    fundingEl.innerHTML = (avg !== null && avg !== undefined)
-                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Funding Avg</div>
-                           <div class="text-lg font-mono ${color}">${(avg * 100).toFixed(4)}%</div>`
-                        : '<div class="text-xs text-base-content/40">No data</div>';
+                    fundingEl.innerHTML = (avg !== null && avg !== undefined) ?
+                        `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Funding Avg</div>
+                           <div class="text-lg font-mono ${color}">${(avg * 100).toFixed(4)}%</div>` :
+                        '<div class="text-xs text-base-content/40">No data</div>';
                 }
 
                 if (globalEl) {
                     const g = data.global || {};
-                    globalEl.innerHTML = g.btc_dominance
-                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Dominance</div>
-                           <div class="text-lg font-mono">${g.btc_dominance.toFixed(1)}%</div>`
-                        : '<div class="text-xs text-base-content/40">No data</div>';
+                    globalEl.innerHTML = g.btc_dominance ?
+                        `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Dominance</div>
+                           <div class="text-lg font-mono">${g.btc_dominance.toFixed(1)}%</div>` :
+                        '<div class="text-xs text-base-content/40">No data</div>';
                 }
             }
 
@@ -571,21 +571,21 @@
                             webcam.video_id
                             ?
                             `
-                            <iframe
-                                src="https://www.youtube.com/embed/${webcam.video_id}"
-                                class="w-full aspect-video"
-                                frameborder="0"
-                                allowfullscreen>
-                            </iframe>
-                            `
+                                <iframe
+                                    src="https://www.youtube.com/embed/${webcam.video_id}"
+                                    class="w-full aspect-video"
+                                    frameborder="0"
+                                    allowfullscreen>
+                                </iframe>
+                                `
                             :
                             `
-                            <div class="aspect-video flex items-center justify-center">
-                                <span class="text-xs text-error">
-                                    Offline
-                                </span>
-                            </div>
-                            `
+                                <div class="aspect-video flex items-center justify-center">
+                                    <span class="text-xs text-error">
+                                        Offline
+                                    </span>
+                                </div>
+                                `
                         }
 
                     </div>
