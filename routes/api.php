@@ -83,6 +83,9 @@ Route::prefix('news')->group(function () {
     Route::get('/alchemy/gas', [NewsController::class, 'getAlchemyGas'])
         ->name('news.alchemy.gas');
 
+    Route::get('/alchemy/whale-tx', [NewsController::class, 'getAlchemyWhaleTx'])
+        ->name('news.alchemy.whale-tx');
+
     // ============ CRYPTOQUANT ============
 
     Route::get('/cryptoquant/netflow', [NewsController::class, 'getCryptoQuantNetflow'])

@@ -697,6 +697,81 @@ class NewsService
     // ALCHEMY (JSON-RPC, bukan REST)
     // ============================================================
 
+    public function getAlchemyWhaleTransactions(float $minEth = 100): array
+    {
+        return Cache::remember("alchemy_whale_tx_{$minEth}", now()->addMinutes(2), function () use ($minEth) {
+            try {
+                // 1. Ambil block number terbaru
+                $blockNumberResponse = Http::timeout(10)
+                    ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
+                        'jsonrpc' => '2.0',
+                        'method'  => 'eth_blockNumber',
+                        'params'  => [],
+                        'id'      => 1,
+                    ]);
+
+                if (!$blockNumberResponse->successful()) {
+                    Log::warning('Alchemy whale tx: block number fetch failed');
+                    return [];
+                }
+
+                $latestBlockHex = $blockNumberResponse->json('result');
+
+                if (!$latestBlockHex) {
+                    return [];
+                }
+
+                // 2. Ambil block lengkap dengan semua transaksinya
+                $blockResponse = Http::timeout(15)
+                    ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
+                        'jsonrpc' => '2.0',
+                        'method'  => 'eth_getBlockByNumber',
+                        'params'  => [$latestBlockHex, true], // true = full transaction objects
+                        'id'      => 1,
+                    ]);
+
+                if (!$blockResponse->successful()) {
+                    Log::warning('Alchemy whale tx: block detail fetch failed');
+                    return [];
+                }
+
+                $block = $blockResponse->json('result');
+
+                if (!$block || empty($block['transactions'])) {
+                    return [];
+                }
+
+                $minWei = $minEth * 1e18;
+
+                $whaleTxs = collect($block['transactions'])
+                    ->filter(function ($tx) use ($minWei) {
+                        $valueWei = hexdec($tx['value'] ?? '0x0');
+                        return $valueWei >= $minWei;
+                    })
+                    ->map(function ($tx) {
+                        $valueEth = hexdec($tx['value']) / 1e18;
+
+                        return [
+                            'hash'  => $tx['hash'] ?? null,
+                            'from'  => $tx['from'] ?? null,
+                            'to'    => $tx['to'] ?? null,
+                            'value_eth' => round($valueEth, 4),
+                        ];
+                    })
+                    ->values()
+                    ->toArray();
+
+                return [
+                    'block_number' => hexdec($latestBlockHex),
+                    'transactions' => $whaleTxs,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('Alchemy whale tx error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
     public function getAlchemyLatestBlock(): array
     {
         return Cache::remember('alchemy_latest_block', now()->addMinutes(1), function () {

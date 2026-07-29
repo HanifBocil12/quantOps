@@ -121,6 +121,7 @@
                     <div id="onchain-tvl" class="max-h-[140px] overflow-y-auto pr-1"></div>
                     <div id="alchemy-block" class="text-xs text-base-content/40">Loading block...</div>
                     <div id="alchemy-gas" class="text-xs text-base-content/40">Loading gas...</div>
+                    <div id="alchemy-whale" class="text-xs text-base-content/40">Loading whale tx...</div>
                 </div>
             </div>
         </div>
@@ -313,6 +314,46 @@
                 `;
             }
 
+            function renderAlchemyWhale(data) {
+                const el = document.getElementById('alchemy-whale');
+                if (!el) return;
+
+                if (!data || !data.transactions || data.transactions.length === 0) {
+                    el.innerHTML = `
+                        <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Whale Tx (&gt;100 ETH)</p>
+                        <p class="text-xs text-base-content/40">No whale tx in latest block</p>
+                    `;
+                    return;
+                }
+
+                const shortAddr = (addr) => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '-';
+
+                el.innerHTML = `
+                        <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">
+                            Whale Tx (&gt;100 ETH) — Block #${data.block_number.toLocaleString()}
+                        </p>
+                        ${data.transactions.map(tx => `
+                                        <a href="https://etherscan.io/tx/${tx.hash}" target="_blank"
+                                        class="block border-b border-base-300 pb-1.5 mb-1.5 hover:opacity-80 transition last:border-0">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs font-mono text-base-content/80">${shortAddr(tx.from)} → ${shortAddr(tx.to)}</span>
+                                                <span class="text-xs font-mono text-green-500">${tx.value_eth} ETH</span>
+                                            </div>
+                                        </a>
+                                    `).join('')}
+                    `;
+            }
+
+            fetch('{{ route('news.alchemy.whale-tx') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderAlchemyWhale(data);
+                })
+                .catch(() => {
+                    const el = document.getElementById('alchemy-whale');
+                    if (el) el.innerHTML = '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
+
             function formatWatchlistPrice(price) {
                 if (price >= 1000) return price.toLocaleString('en-US', {
                     maximumFractionDigits: 0
@@ -372,11 +413,11 @@
                 el.innerHTML = `
                     <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Chain TVL</p>
                     ${items.map(item => `
-                                            <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
-                                                <span class="text-xs text-base-content/80">${item.name}</span>
-                                                <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
-                                            </div>
-                                        `).join('')}
+                                                            <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
+                                                                <span class="text-xs text-base-content/80">${item.name}</span>
+                                                                <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
+                                                            </div>
+                                                        `).join('')}
                 `;
             }
 
@@ -622,21 +663,21 @@
                             webcam.video_id
                             ?
                             `
-                                                <iframe
-                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                    class="w-full aspect-video"
-                                                    frameborder="0"
-                                                    allowfullscreen>
-                                                </iframe>
-                                                `
+                                                                <iframe
+                                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                    class="w-full aspect-video"
+                                                                    frameborder="0"
+                                                                    allowfullscreen>
+                                                                </iframe>
+                                                                `
                             :
                             `
-                                                <div class="aspect-video flex items-center justify-center">
-                                                    <span class="text-xs text-error">
-                                                        Offline
-                                                    </span>
-                                                </div>
-                                                `
+                                                                <div class="aspect-video flex items-center justify-center">
+                                                                    <span class="text-xs text-error">
+                                                                        Offline
+                                                                    </span>
+                                                                </div>
+                                                                `
                         }
 
                     </div>

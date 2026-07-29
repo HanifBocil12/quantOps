@@ -143,6 +143,13 @@ class NewsController extends Controller
         );
     }
 
+    public function getAlchemyWhaleTx()
+    {
+        return response()->json(
+            $this->newsService->getAlchemyWhaleTransactions(minEth: 100)
+        );
+    }
+
     // ============ CRYPTOQUANT ============
 
     public function getCryptoQuantNetflow()
