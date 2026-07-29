@@ -103,9 +103,12 @@ class NewsService
         'whale_alert_io',
     ];
 
+    // ============================================================
+    // GENERAL / WORLD / WAR NEWS (RSS + Telegram)
+    // ============================================================
+
     public function getNews(int $limit = 20): array
     {
-        // Ambil semua topic sekaligus - dashboard umum belum dipisah per topic
         $allNews = array_merge(
             $this->getRssNews(),
             Cache::get('telegram_news', [])
@@ -240,15 +243,10 @@ class NewsService
         $clean = preg_replace('/[^\p{L}\p{N}\s]/u', '', $title);
         $clean = mb_strtolower(trim($clean));
 
-        // Samain semua whitespace (termasuk newline) jadi 1 spasi
         $clean = preg_replace('/\s+/', ' ', $clean);
 
-        // Buang boilerplate: nama source + prefix generik ("just in", "new", "breaking")
-        // biar fingerprint mulai dari konten yang beneran beda-beda per tweet
         $clean = preg_replace('/^(bitcoin magazine )?(twitterx )?(just in|new|breaking) ?/', '', $clean);
 
-        // Naikin ke 10 kata karena sekarang budget-nya dipake buat konten asli,
-        // bukan kehabisan di boilerplate
         return implode(' ', array_slice(explode(' ', $clean), 0, 10));
     }
 
@@ -325,8 +323,18 @@ class NewsService
 
         return $allNews;
     }
-    //TODO CRYPTO
-    // ============ COINGECKO (keyless) ============
+
+    protected function categorizeGeneralNews(array $news): array
+    {
+        return [
+            'live' => [],        // TODO: isi nanti
+            'markets' => [],      // TODO: isi nanti
+        ];
+    }
+
+    // ============================================================
+    // COINGECKO (keyless)
+    // ============================================================
 
     public function getCoinGeckoTrending(): array
     {
@@ -390,7 +398,9 @@ class NewsService
         });
     }
 
-    // ============ DEFILLAMA (keyless) ============
+    // ============================================================
+    // DEFILLAMA (keyless)
+    // ============================================================
 
     public function getDefiLlamaChainsTvl(int $limit = 10): array
     {
@@ -453,7 +463,9 @@ class NewsService
         });
     }
 
-    // ============ DERIBIT (keyless, endpoint public) ============
+    // ============================================================
+    // DERIBIT (keyless, endpoint public)
+    // ============================================================
 
     public function getDeribitIndexPrices(): array
     {
@@ -524,7 +536,9 @@ class NewsService
         });
     }
 
-    // ============ ETHERSCAN ============
+    // ============================================================
+    // ETHERSCAN
+    // ============================================================
 
     public function getEtherscanGasOracle(): array
     {
@@ -588,20 +602,22 @@ class NewsService
         });
     }
 
-    // ============ COINGLASS ============
+    // ============================================================
+    // COINGLASS
+    // ============================================================
 
-    public function getCoinglassFundingRates(): array
+    public function getCoinglassFundingRates(string $symbol = 'BTC'): array
     {
-        return Cache::remember('coinglass_funding_rates', now()->addMinutes(5), function () {
+        return Cache::remember("coinglass_funding_rates_{$symbol}", now()->addMinutes(5), function () use ($symbol) {
             try {
                 $response = Http::timeout(10)
                     ->withHeaders(['CG-API-KEY' => env('COINGLASS_API_KEY')])
                     ->get('https://open-api-v4.coinglass.com/api/futures/funding-rate/exchange-list', [
-                        'symbol' => 'BTC',
+                        'symbol' => $symbol,
                     ]);
 
                 if (!$response->successful()) {
-                    Log::warning('Coinglass funding rate fetch failed', ['status' => $response->status()]);
+                    Log::warning('Coinglass funding rate fetch failed', ['status' => $response->status(), 'symbol' => $symbol]);
                     return [];
                 }
 
@@ -620,18 +636,18 @@ class NewsService
         });
     }
 
-    public function getCoinglassOpenInterest(): array
+    public function getCoinglassOpenInterest(string $symbol = 'BTC'): array
     {
-        return Cache::remember('coinglass_open_interest', now()->addMinutes(5), function () {
+        return Cache::remember("coinglass_open_interest_{$symbol}", now()->addMinutes(5), function () use ($symbol) {
             try {
                 $response = Http::timeout(10)
                     ->withHeaders(['CG-API-KEY' => env('COINGLASS_API_KEY')])
                     ->get('https://open-api-v4.coinglass.com/api/futures/open-interest/exchange-list', [
-                        'symbol' => 'BTC',
+                        'symbol' => $symbol,
                     ]);
 
                 if (!$response->successful()) {
-                    Log::warning('Coinglass open interest fetch failed', ['status' => $response->status()]);
+                    Log::warning('Coinglass open interest fetch failed', ['status' => $response->status(), 'symbol' => $symbol]);
                     return [];
                 }
 
@@ -650,7 +666,36 @@ class NewsService
         });
     }
 
-    // ============ ALCHEMY (JSON-RPC, bukan REST) ============
+    /**
+     * Rata-rata funding rate lintas exchange buat 1 symbol.
+     * Dipake buat badge kecil di Markets watchlist & summary stats.
+     */
+    public function getAvgFundingRate(string $symbol): ?float
+    {
+        $rates = $this->getCoinglassFundingRates($symbol);
+
+        if (empty($rates)) {
+            return null;
+        }
+
+        $values = collect($rates)->pluck('funding_rate')->filter(fn($v) => $v !== null);
+
+        return $values->isEmpty() ? null : round($values->avg(), 6);
+    }
+
+    /**
+     * Funding rate buat beberapa symbol sekaligus, dipake Markets watchlist.
+     */
+    public function getFundingRatesForSymbols(array $symbols): array
+    {
+        return collect($symbols)
+            ->mapWithKeys(fn($symbol) => [$symbol => $this->getAvgFundingRate($symbol)])
+            ->toArray();
+    }
+
+    // ============================================================
+    // ALCHEMY (JSON-RPC, bukan REST)
+    // ============================================================
 
     public function getAlchemyLatestBlock(): array
     {
@@ -711,7 +756,9 @@ class NewsService
         });
     }
 
-    // ============ CRYPTOQUANT ============
+    // ============================================================
+    // CRYPTOQUANT
+    // ============================================================
 
     public function getCryptoQuantExchangeNetflow(string $exchange = 'binance', string $symbol = 'btc'): array
     {
@@ -749,7 +796,30 @@ class NewsService
         });
     }
 
-    //TODO YOUTUBE
+    // ============================================================
+    // MARKET STATS SUMMARY (dipake buat row "Market Stats"/Komoditas)
+    // ============================================================
+
+    public function getMarketStatsSummary(): array
+    {
+        return Cache::remember('market_stats_summary', now()->addMinutes(5), function () {
+            $gas = $this->getEtherscanGasOracle();
+            $index = $this->getDeribitIndexPrices();
+            $funding = $this->getCoinglassFundingRates('BTC');
+            $global = $this->getCoinGeckoGlobal();
+
+            return [
+                'gas' => $gas,
+                'index' => $index,
+                'funding_avg' => collect($funding)->pluck('funding_rate')->filter()->avg(),
+                'global' => $global,
+            ];
+        });
+    }
+
+    // ============================================================
+    // YOUTUBE LIVE WEBCAMS
+    // ============================================================
 
     public function getLiveWebcams(): array
     {
@@ -930,8 +1000,8 @@ class NewsService
     protected function getYoutubeKeys(): array
     {
         return array_values(array_filter([
-            env('YOUTUBE_API_KEY'),
             env('YOUTUBE_API_KEY_1'),
+            env('YOUTUBE_API_KEY_2'),
         ]));
     }
 
@@ -980,8 +1050,6 @@ class NewsService
 
             $reason = $response->json('error.errors.0.reason');
 
-            // Tangkep status 429 (Too Many Requests) juga sebagai sinyal quota,
-            // selain cocokin reason string
             if ($response->status() === 429 || in_array($reason, $quotaReasons)) {
                 logger()->warning("YouTube key #{$index} quota/rate limit hit, trying next key", [
                     'channelId' => $channelId,
@@ -1002,13 +1070,5 @@ class NewsService
         logger()->error("All YouTube API keys exhausted for channel: {$channelId}");
 
         return null;
-    }
-
-    protected function categorizeGeneralNews(array $news): array
-    {
-        return [
-            'live' => [],        // TODO: isi nanti
-            'markets' => [],      // TODO: isi nanti
-        ];
     }
 }

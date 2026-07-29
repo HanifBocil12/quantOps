@@ -94,19 +94,19 @@
                 <div class="grid grid-cols-2 gap-3 h-full">
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Live news</div>
+                        <div id="government-live"></div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">The fed live</div>
+                        <div id="fed-live"></div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Trump live</div>
+                        <div id="trump-live"></div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Markets</div>
+                        <div id="macro-market"></div>
                     </div>
                 </div>
             </div>
@@ -140,24 +140,62 @@
             </div>
         </div>
 
-        {{-- Row 3 - Komoditas (full width) --}}
+        {{-- Row 3 - Komoditas --}}
         <div class="card border border-line-new lg:col-span-4 h-[200px] w-full">
             <div class="card-body p-4 h-full w-full">
-                <h3 class="text-sm font-semibold text-base-content/70 mb-3">Komoditas</h3>
+
+                <h3 class="text-sm font-semibold text-base-content/70 mb-3">
+                    Komoditas
+                </h3>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full">
-                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Live news</div>
+
+                    <div class="bg-base-300 rounded p-3 overflow-hidden">
+                        <h4 class="text-xs font-semibold mb-2">
+                            Gold / Precious Metal
+                        </h4>
+
+                        <div id="commodity-gold" class="text-xs overflow-y-auto max-h-[120px]">
+                            Loading...
+                        </div>
                     </div>
-                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Crypto news</div>
+
+
+                    <div class="bg-base-300 rounded p-3 overflow-hidden">
+                        <h4 class="text-xs font-semibold mb-2">
+                            Energy
+                        </h4>
+
+                        <div id="commodity-energy" class="text-xs overflow-y-auto max-h-[120px]">
+                            Loading...
+                        </div>
                     </div>
-                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">World news</div>
+
+
+                    <div class="bg-base-300 rounded p-3 overflow-hidden">
+                        <h4 class="text-xs font-semibold mb-2">
+                            Agriculture
+                        </h4>
+
+                        <div id="commodity-agriculture" class="text-xs overflow-y-auto max-h-[120px]">
+                            Loading...
+                        </div>
                     </div>
-                    <div class="bg-base-300 rounded p-3 flex items-center justify-center">
-                        <div class="text-xs text-base-content/70">Markets</div>
+
+
+                    <div class="bg-base-300 rounded p-3 overflow-hidden">
+                        <h4 class="text-xs font-semibold mb-2">
+                            Market
+                        </h4>
+
+                        <div id="commodity-market" class="text-xs overflow-y-auto max-h-[120px]">
+                            Loading...
+                        </div>
                     </div>
+
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -240,6 +278,38 @@
                         <p class="text-xs text-base-content/80 leading-snug">${item.title}</p>
                     </a>
                 `).join('');
+            }
+
+            function renderSmallNews(id, data) {
+
+                const el = document.getElementById(id);
+
+                if (!data.length) {
+                    el.innerHTML =
+                        `<span class="text-xs opacity-50">
+                     No data
+                    </span>`;
+                    return;
+                }
+
+
+                el.innerHTML = data.slice(0, 5).map(item => `
+
+                    <a href="${item.url}" target="_blank"
+                    class="block text-xs border-b border-base-300 py-2">
+
+                        <span class="text-[9px] opacity-50">
+                            ${item.source}
+                        </span>
+
+                        <br>
+
+                        ${item.title}
+
+                    </a>
+
+                `).join('');
+
             }
 
             function renderCryptoNewsGrouped(grouped) {
@@ -371,6 +441,45 @@
                 }).join('');
             }
 
+            fetch('{{ route('news.macro.government') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderSmallNews(
+                        "government-live",
+                        data
+                    );
+                });
+
+
+            fetch('{{ route('news.macro.fed') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderSmallNews(
+                        "fed-live",
+                        data
+                    );
+                });
+
+
+            fetch('{{ route('news.macro.trump') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderSmallNews(
+                        "trump-live",
+                        data
+                    );
+                });
+
+
+            fetch('{{ route('news.macro.markets') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderSmallNews(
+                        "macro-market",
+                        data
+                    );
+                });
+
             // ============ SAMPE SINI ============
 
             fetch('{{ route('news.index') }}')
@@ -464,6 +573,37 @@
 
                 });
 
+            fetch('{{ route('news.commodity') }}')
+                .then(r => r.json())
+                .then(data => {
+
+
+                    renderNews(
+                        document.getElementById('commodity-gold'),
+                        data.gold || []
+                    );
+
+
+                    renderNews(
+                        document.getElementById('commodity-energy'),
+                        data.energy || []
+                    );
+
+
+                    renderNews(
+                        document.getElementById('commodity-agriculture'),
+                        data.agriculture || []
+                    );
+
+
+                    renderNews(
+                        document.getElementById('commodity-market'),
+                        data.market || []
+                    );
+
+
+                });
+
 
 
             function renderWebcams(region) {
@@ -495,23 +635,23 @@
                 ?
 
                 `
-                                                                                        <iframe
-                                                                                            src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                                            class="w-full aspect-video"
-                                                                                            frameborder="0"
-                                                                                            allowfullscreen>
-                                                                                        </iframe>
-                                                                                        `
+                                <iframe
+                                    src="https://www.youtube.com/embed/${webcam.video_id}"
+                                    class="w-full aspect-video"
+                                    frameborder="0"
+                                    allowfullscreen>
+                                </iframe>
+                                `
 
                 :
 
                 `
-                                                                                        <div class="aspect-video flex items-center justify-center">
-                                                                                            <span class="text-xs text-error">
-                                                                                                Offline
-                                                                                            </span>
-                                                                                        </div>
-                                                                                        `
+                                <div class="aspect-video flex items-center justify-center">
+                                    <span class="text-xs text-error">
+                                        Offline
+                                    </span>
+                                </div>
+                         `
 
             }
 
