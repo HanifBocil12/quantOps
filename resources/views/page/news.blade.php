@@ -522,13 +522,66 @@
 
                     // Onchain Data card bawah
                     renderOnchainData(
-                        document.getElementById('onchain-data'),
                         grouped.onchain_alert || []
                     );
 
                 })
 
             // LIVE YOUTUBE NEWS
+
+            Promise.all([
+                    fetch('{{ route('news.etherscan.gas') }}').then(r => r.json()),
+                    fetch('{{ route('news.etherscan.eth-price') }}').then(r => r.json()),
+                    fetch('{{ route('news.coinglass.funding') }}').then(r => r.json()),
+                    fetch('{{ route('news.coinglass.open-interest') }}').then(r => r.json()),
+                    fetch('{{ route('news.alchemy.block') }}').then(r => r.json()),
+                    fetch('{{ route('news.cryptoquant.netflow') }}').then(r => r.json()),
+                ])
+                .then(([gas, eth, funding, oi, block, netflow]) => {
+
+                    const data = [{
+                            title: 'ETH Gas',
+                            value: JSON.stringify(gas)
+                        },
+                        {
+                            title: 'ETH Price',
+                            value: JSON.stringify(eth)
+                        },
+                        {
+                            title: 'Funding Rate',
+                            value: JSON.stringify(funding)
+                        },
+                        {
+                            title: 'Open Interest',
+                            value: JSON.stringify(oi)
+                        },
+                        {
+                            title: 'Latest Block',
+                            value: JSON.stringify(block)
+                        },
+                        {
+                            title: 'Exchange Netflow',
+                            value: JSON.stringify(netflow)
+                        }
+                    ];
+
+
+                    document.getElementById('onchain-data').innerHTML =
+                        data.map(item => `
+
+        <div class="flex justify-between border-b border-base-300 py-2 text-xs">
+
+            <span>${item.title}</span>
+
+            <span class="font-mono truncate max-w-[150px]">
+                ${item.value}
+            </span>
+
+        </div>
+
+        `).join('');
+
+                });
 
             let webcams = [];
 
@@ -635,23 +688,23 @@
                 ?
 
                 `
-                                <iframe
-                                    src="https://www.youtube.com/embed/${webcam.video_id}"
-                                    class="w-full aspect-video"
-                                    frameborder="0"
-                                    allowfullscreen>
-                                </iframe>
-                                `
+                                        <iframe
+                                            src="https://www.youtube.com/embed/${webcam.video_id}"
+                                            class="w-full aspect-video"
+                                            frameborder="0"
+                                            allowfullscreen>
+                                        </iframe>
+                                        `
 
                 :
 
                 `
-                                <div class="aspect-video flex items-center justify-center">
-                                    <span class="text-xs text-error">
-                                        Offline
-                                    </span>
-                                </div>
-                         `
+                                        <div class="aspect-video flex items-center justify-center">
+                                            <span class="text-xs text-error">
+                                                Offline
+                                            </span>
+                                        </div>
+                                 `
 
             }
 

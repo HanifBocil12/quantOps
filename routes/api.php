@@ -116,9 +116,4 @@ Route::prefix('news')->group(function () {
     Route::get('/commodity', [NewsController::class, 'getCommodityNews'])
         ->name('news.commodity');
 
-
-    // ============ ONCHAIN DETAIL ============
-
-    Route::get('/onchain/summary', [NewsController::class, 'getOnchainSummary'])
-        ->name('news.onchain.summary');
 });
