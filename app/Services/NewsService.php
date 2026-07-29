@@ -149,16 +149,24 @@ class NewsService
 
     public function getWorldNews(int $limit = 20): array
     {
-        $allNews = array_merge(
-            $this->getRssNews('world'),
-            Cache::get('telegram_world_news', [])
+        $rssNews = $this->filterNews($this->getRssNews('world'));
+        $telegramNews = $this->filterNews(Cache::get('telegram_world_news', []));
+
+        usort($rssNews, fn($a, $b) => $b['published'] - $a['published']);
+        usort($telegramNews, fn($a, $b) => $b['published'] - $a['published']);
+
+        // Jatah minimal 30% slot buat Telegram, sisanya RSS
+        $telegramQuota = (int) ceil($limit * 0.3);
+        $rssQuota = $limit - $telegramQuota;
+
+        $combined = array_merge(
+            array_slice($telegramNews, 0, $telegramQuota),
+            array_slice($rssNews, 0, $rssQuota)
         );
 
-        $allNews = $this->filterNews($allNews);
+        usort($combined, fn($a, $b) => $b['published'] - $a['published']);
 
-        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
-
-        return array_slice($allNews, 0, $limit);
+        return array_slice($combined, 0, $limit);
     }
 
     public function getWarNews(int $limit = 20): array
