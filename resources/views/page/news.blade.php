@@ -69,10 +69,10 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-full w-full">
+        <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Markets</h3>
-                <div id="markets-news" class="mt-2 space-y-2 flex-1 overflow-y-auto">
+                <div id="markets-news" class="mt-2 space-y-1 flex-1 overflow-y-auto">
                     <div class="animate-pulse flex space-x-2">
                         <div class="flex-1 space-y-2">
                             <div class="h-2 bg-base-300 rounded"></div>
@@ -293,13 +293,20 @@
                 .then(r => r.json())
                 .then(news => {
                     renderNews(document.getElementById('live-news'), news.live);
-                    renderNews(document.getElementById('markets-news'), news.markets);
                 })
                 .catch(() => {
-                    ['live-news', 'markets-news'].forEach(id => {
-                        document.getElementById(id).innerHTML =
-                            '<p class="text-xs text-base-content/40">Failed to load</p>';
-                    });
+                    document.getElementById('live-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
+
+            fetch('{{ route('markets.watchlist') }}')
+                .then(r => r.json())
+                .then(items => {
+                    renderMarketsWatchlist(items);
+                })
+                .catch(() => {
+                    document.getElementById('markets-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
 
             fetch('{{ route('news.world') }}')
@@ -403,23 +410,23 @@
                 ?
 
                 `
-                                                                    <iframe
-                                                                        src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                        class="w-full aspect-video"
-                                                                        frameborder="0"
-                                                                        allowfullscreen>
-                                                                    </iframe>
-                                                                    `
+                                                                            <iframe
+                                                                                src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                                class="w-full aspect-video"
+                                                                                frameborder="0"
+                                                                                allowfullscreen>
+                                                                            </iframe>
+                                                                            `
 
                 :
 
                 `
-                                                                    <div class="aspect-video flex items-center justify-center">
-                                                                        <span class="text-xs text-error">
-                                                                            Offline
-                                                                        </span>
-                                                                    </div>
-                                                                    `
+                                                                            <div class="aspect-video flex items-center justify-center">
+                                                                                <span class="text-xs text-error">
+                                                                                    Offline
+                                                                                </span>
+                                                                            </div>
+                                                                            `
 
             }
 

@@ -177,9 +177,11 @@ class BinanceService
 
     public function getPopular(int $limit = 3): Collection
     {
-        return collect($this->getMarketList())->filter(fn($t) => in_array($t['symbol'], $this->majorPairs()))
-            ->sortByDesc('quoteVolume')
-            ->take($limit);
+        return collect($this->getMarketList())
+            ->filter(fn($t) => in_array($t['pair'], $this->majorPairs()))
+            ->sortByDesc('volume_usdt')
+            ->take($limit)
+            ->values();
     }
 
     private function majorPairs(): array
@@ -190,14 +192,57 @@ class BinanceService
     public function getTertinggi(int $limit = 3): Collection
     {
         return collect($this->getMarketList())
-            ->sortByDesc('priceChangePercent')
-            ->take($limit);
+            ->sortByDesc('change_pct')
+            ->take($limit)
+            ->values();
     }
 
     public function getVolumeTeratas(int $limit = 3): Collection
     {
         return collect($this->getMarketList())
-            ->sortByDesc('quoteVolume')
-            ->take($limit);
+            ->sortByDesc('volume_usdt')
+            ->take($limit)
+            ->values();
+    }
+
+    public function getKlines(string $pair, string $interval = '1h', int $limit = 24): array
+    {
+        $response = $this->getHttpClient()
+            ->get("{$this->baseUrl}/api/v3/klines", [
+                'symbol' => strtoupper($pair),
+                'interval' => $interval,
+                'limit' => $limit,
+            ]);
+
+        // tiap kline: [openTime, open, high, low, close, volume, closeTime, ...]
+        return collect($response->json())
+            ->map(fn($k) => (float) $k[4]) // ambil close price aja
+            ->values()
+            ->toArray();
+    }
+
+    public function getWatchlist(array $pairs = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']): array
+    {
+        $allMarkets = collect($this->getMarketList())->keyBy('pair');
+
+        return collect($pairs)
+            ->map(function ($pair) use ($allMarkets) {
+                $ticker = $allMarkets->get($pair);
+
+                if (!$ticker) {
+                    return null;
+                }
+
+                return [
+                    'symbol' => $ticker['symbol'],
+                    'pair' => $ticker['pair'],
+                    'price' => $ticker['price'],
+                    'change_pct' => $ticker['change_pct'],
+                    'sparkline' => $this->getKlines($pair, '1h', 24),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->toArray();
     }
 }

@@ -12,7 +12,6 @@ Route::prefix('binance')->group(function () {
 
     Route::get('/market', [BinanceController::class, 'market'])
         ->name('api.binance.market');
-
 });
 
 
@@ -30,4 +29,5 @@ Route::prefix('news')->group(function () {
     Route::get('/getLiveWebcams', [NewsController::class, 'getLiveWebcams'])
         ->name('news.webcams');
 
+    Route::get('/watchlist', [BinanceController::class, 'watchlist'])->name('markets.watchlist');
 });

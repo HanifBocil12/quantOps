@@ -27,4 +27,11 @@ class BinanceController extends Controller
         if ($price >= 0.0001) return number_format($price, 6);
         return number_format($price, 8);
     }
+
+    public function watchlist(): JsonResponse
+    {
+        return response()->json(
+            $this->binance->getWatchlist(['BTCUSDT', 'ETHUSDT', 'BNBUSDT'])
+        );
+    }
 }
