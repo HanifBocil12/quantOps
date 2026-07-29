@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="card border border-line-new h-full w-full">
+        <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full overflow-hidden">
                 <h3 class="text-sm font-semibold text-base-content/70">
                     World news
@@ -94,34 +94,31 @@
                 <div class="grid grid-cols-2 gap-3 h-full">
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div id="government-live"></div>
+                        <div class="text-xs text-base-content/70">Live news</div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div id="fed-live"></div>
+                        <div class="text-xs text-base-content/70">The fed live</div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div id="trump-live"></div>
+                        <div class="text-xs text-base-content/70">Trump live</div>
                     </div>
                     <div
                         class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
-                        <div id="macro-market"></div>
+                        <div class="text-xs text-base-content/70">Markets</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        {{-- Onchain data: Whale Alert (Telegram) + DefiLlama Chain TVL --}}
         <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Onchain data</h3>
-                <div id="onchain-data" class="mt-2 space-y-2 flex-1 overflow-y-auto">
-                    <div class="animate-pulse flex space-x-2">
-                        <div class="flex-1 space-y-2">
-                            <div class="h-2 bg-base-300 rounded"></div>
-                            <div class="h-2 bg-base-300 rounded w-3/4"></div>
-                        </div>
-                    </div>
+                <div id="onchain-news" class="mt-2 space-y-3 flex-1 overflow-hidden">
+                    <div id="onchain-data" class="max-h-[140px] overflow-y-auto pr-1"></div>
+                    <div id="onchain-tvl" class="max-h-[140px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </div>
@@ -140,62 +137,24 @@
             </div>
         </div>
 
-        {{-- Row 3 - Komoditas --}}
+        {{-- Row 3 - Market Stats (full width): ETH gas, BTC index, funding avg, BTC dominance --}}
         <div class="card border border-line-new lg:col-span-4 h-[200px] w-full">
             <div class="card-body p-4 h-full w-full">
-
-                <h3 class="text-sm font-semibold text-base-content/70 mb-3">
-                    Komoditas
-                </h3>
-
+                <h3 class="text-sm font-semibold text-base-content/70 mb-3">Market Stats</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full">
-
-                    <div class="bg-base-300 rounded p-3 overflow-hidden">
-                        <h4 class="text-xs font-semibold mb-2">
-                            Gold / Precious Metal
-                        </h4>
-
-                        <div id="commodity-gold" class="text-xs overflow-y-auto max-h-[120px]">
-                            Loading...
-                        </div>
+                    <div id="stat-gas" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
+                        <div class="text-xs text-base-content/40">Loading...</div>
                     </div>
-
-
-                    <div class="bg-base-300 rounded p-3 overflow-hidden">
-                        <h4 class="text-xs font-semibold mb-2">
-                            Energy
-                        </h4>
-
-                        <div id="commodity-energy" class="text-xs overflow-y-auto max-h-[120px]">
-                            Loading...
-                        </div>
+                    <div id="stat-index" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
+                        <div class="text-xs text-base-content/40">Loading...</div>
                     </div>
-
-
-                    <div class="bg-base-300 rounded p-3 overflow-hidden">
-                        <h4 class="text-xs font-semibold mb-2">
-                            Agriculture
-                        </h4>
-
-                        <div id="commodity-agriculture" class="text-xs overflow-y-auto max-h-[120px]">
-                            Loading...
-                        </div>
+                    <div id="stat-funding" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
+                        <div class="text-xs text-base-content/40">Loading...</div>
                     </div>
-
-
-                    <div class="bg-base-300 rounded p-3 overflow-hidden">
-                        <h4 class="text-xs font-semibold mb-2">
-                            Market
-                        </h4>
-
-                        <div id="commodity-market" class="text-xs overflow-y-auto max-h-[120px]">
-                            Loading...
-                        </div>
+                    <div id="stat-global" class="bg-base-300 rounded p-3 flex flex-col items-center justify-center">
+                        <div class="text-xs text-base-content/40">Loading...</div>
                     </div>
-
-
                 </div>
-
             </div>
         </div>
     </div>
@@ -264,7 +223,7 @@
                 }).addTo(map).bindPopup(`<b>${n.name}</b><br>${n.pnl}`);
             });
 
-            {{-- NEWS FETCH --}}
+            {{-- ============ RENDER HELPERS ============ --}}
 
             function renderNews(el, items) {
                 if (!items.length) {
@@ -278,38 +237,6 @@
                         <p class="text-xs text-base-content/80 leading-snug">${item.title}</p>
                     </a>
                 `).join('');
-            }
-
-            function renderSmallNews(id, data) {
-
-                const el = document.getElementById(id);
-
-                if (!data.length) {
-                    el.innerHTML =
-                        `<span class="text-xs opacity-50">
-                     No data
-                    </span>`;
-                    return;
-                }
-
-
-                el.innerHTML = data.slice(0, 5).map(item => `
-
-                    <a href="${item.url}" target="_blank"
-                    class="block text-xs border-b border-base-300 py-2">
-
-                        <span class="text-[9px] opacity-50">
-                            ${item.source}
-                        </span>
-
-                        <br>
-
-                        ${item.title}
-
-                    </a>
-
-                `).join('');
-
             }
 
             function renderCryptoNewsGrouped(grouped) {
@@ -359,22 +286,6 @@
                 renderNews(el, items);
             }
 
-            function renderOnchainData(el, items) {
-                renderNews(el, items);
-            }
-
-            fetch('{{ route('news.war') }}')
-                .then(r => r.json())
-                .then(news => {
-                    renderNews(document.getElementById('war-news'), news);
-                })
-                .catch(() => {
-                    document.getElementById('war-news').innerHTML =
-                        '<p class="text-xs text-base-content/40">Failed to load</p>';
-                });
-
-            // ============ TAMBAHIN 3 FUNCTION INI DI SINI ============
-
             function buildSparkline(points) {
                 if (!points || points.length < 2) return '';
 
@@ -408,7 +319,7 @@
                 return price.toFixed(6);
             }
 
-            function renderMarketsWatchlist(items) {
+            function renderMarketsWatchlist(items, fundingRates = {}) {
                 const el = document.getElementById('markets-news');
 
                 if (!el) return;
@@ -423,6 +334,11 @@
                     const changeColor = isUp ? 'text-green-500' : 'text-red-500';
                     const changeSign = isUp ? '+' : '';
 
+                    const funding = fundingRates[item.symbol];
+                    const fundingHtml = (funding !== null && funding !== undefined)
+                        ? `<span class="text-[9px] text-base-content/40 font-mono">fund ${(funding * 100).toFixed(3)}%</span>`
+                        : '';
+
                     return `
                         <div class="flex items-center justify-between py-2.5 border-b border-base-300 last:border-0 hover:bg-base-300/30 transition rounded px-1 -mx-1">
                             <div class="flex flex-col">
@@ -435,52 +351,74 @@
                             <div class="flex flex-col items-end">
                                 <span class="text-sm font-mono">$${formatWatchlistPrice(item.price)}</span>
                                 <span class="text-xs font-mono ${changeColor}">${changeSign}${item.change_pct.toFixed(2)}%</span>
+                                ${fundingHtml}
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            fetch('{{ route('news.macro.government') }}')
-                .then(r => r.json())
-                .then(data => {
-                    renderSmallNews(
-                        "government-live",
-                        data
-                    );
-                });
+            function renderOnchainTvl(items) {
+                const el = document.getElementById('onchain-tvl');
+                if (!el) return;
 
+                if (!items.length) {
+                    el.innerHTML = '<p class="text-xs text-base-content/40">No data available</p>';
+                    return;
+                }
 
-            fetch('{{ route('news.macro.fed') }}')
-                .then(r => r.json())
-                .then(data => {
-                    renderSmallNews(
-                        "fed-live",
-                        data
-                    );
-                });
+                el.innerHTML = `
+                    <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Chain TVL</p>
+                    ${items.map(item => `
+                        <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
+                            <span class="text-xs text-base-content/80">${item.name}</span>
+                            <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
+                        </div>
+                    `).join('')}
+                `;
+            }
 
+            function renderMarketStats(data) {
+                const gasEl = document.getElementById('stat-gas');
+                const indexEl = document.getElementById('stat-index');
+                const fundingEl = document.getElementById('stat-funding');
+                const globalEl = document.getElementById('stat-global');
 
-            fetch('{{ route('news.macro.trump') }}')
-                .then(r => r.json())
-                .then(data => {
-                    renderSmallNews(
-                        "trump-live",
-                        data
-                    );
-                });
+                if (gasEl) {
+                    const gas = data.gas || {};
+                    gasEl.innerHTML = gas.propose_gwei
+                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">ETH Gas</div>
+                           <div class="text-lg font-mono">${gas.propose_gwei} <span class="text-xs">gwei</span></div>`
+                        : '<div class="text-xs text-base-content/40">No data</div>';
+                }
 
+                if (indexEl) {
+                    const btc = (data.index || []).find(i => i.index === 'BTC_USD');
+                    indexEl.innerHTML = btc
+                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Index</div>
+                           <div class="text-lg font-mono">$${Number(btc.price).toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>`
+                        : '<div class="text-xs text-base-content/40">No data</div>';
+                }
 
-            fetch('{{ route('news.macro.markets') }}')
-                .then(r => r.json())
-                .then(data => {
-                    renderSmallNews(
-                        "macro-market",
-                        data
-                    );
-                });
+                if (fundingEl) {
+                    const avg = data.funding_avg;
+                    const color = avg >= 0 ? 'text-green-500' : 'text-red-500';
+                    fundingEl.innerHTML = (avg !== null && avg !== undefined)
+                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Funding Avg</div>
+                           <div class="text-lg font-mono ${color}">${(avg * 100).toFixed(4)}%</div>`
+                        : '<div class="text-xs text-base-content/40">No data</div>';
+                }
 
-            // ============ SAMPE SINI ============
+                if (globalEl) {
+                    const g = data.global || {};
+                    globalEl.innerHTML = g.btc_dominance
+                        ? `<div class="text-[10px] text-base-content/40 uppercase tracking-widest">BTC Dominance</div>
+                           <div class="text-lg font-mono">${g.btc_dominance.toFixed(1)}%</div>`
+                        : '<div class="text-xs text-base-content/40">No data</div>';
+                }
+            }
+
+            {{-- ============ FETCH CALLS ============ --}}
 
             fetch('{{ route('news.index') }}')
                 .then(r => r.json())
@@ -488,20 +426,21 @@
                     renderNews(document.getElementById('live-news'), news.live);
                 })
                 .catch(() => {
-                    document.getElementById('live-news').innerHTML =
-                        '<p class="text-xs text-base-content/40">Failed to load</p>';
+                    const el = document.getElementById('live-news');
+                    if (el) el.innerHTML = '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
 
-            fetch('{{ route('markets.watchlist') }}')
-                .then(r => r.json())
-                .then(items => {
-                    renderMarketsWatchlist(items);
+            Promise.all([
+                    fetch('{{ route('markets.watchlist') }}').then(r => r.json()),
+                    fetch('{{ route('news.markets.funding-rates') }}').then(r => r.json()).catch(() => ({})),
+                ])
+                .then(([items, fundingRates]) => {
+                    renderMarketsWatchlist(items, fundingRates);
                 })
                 .catch(() => {
                     document.getElementById('markets-news').innerHTML =
                         '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
-
 
             fetch('{{ route('news.world') }}')
                 .then(r => r.json())
@@ -520,71 +459,49 @@
                     // Crypto News
                     renderCryptoNewsGrouped(grouped);
 
-                    // Onchain Data card bawah
+                    // Onchain Data card bawah (Whale Alert dari Telegram)
                     renderOnchainData(
+                        document.getElementById('onchain-data'),
                         grouped.onchain_alert || []
                     );
 
+                });
+
+            fetch('{{ route('news.war') }}')
+                .then(r => r.json())
+                .then(news => {
+                    renderNews(document.getElementById('war-news'), news);
                 })
+                .catch(() => {
+                    document.getElementById('war-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
+
+            fetch('{{ route('news.defillama.chains') }}')
+                .then(r => r.json())
+                .then(items => {
+                    renderOnchainTvl(items);
+                })
+                .catch(() => {
+                    const el = document.getElementById('onchain-tvl');
+                    if (el) el.innerHTML = '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
+
+            fetch('{{ route('news.market-stats-summary') }}')
+                .then(r => r.json())
+                .then(data => {
+                    renderMarketStats(data);
+                })
+                .catch(() => {
+                    ['stat-gas', 'stat-index', 'stat-funding', 'stat-global'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.innerHTML = '<div class="text-xs text-base-content/40">Failed</div>';
+                    });
+                });
 
             // LIVE YOUTUBE NEWS
 
-            Promise.all([
-                    fetch('{{ route('news.etherscan.gas') }}').then(r => r.json()),
-                    fetch('{{ route('news.etherscan.eth-price') }}').then(r => r.json()),
-                    fetch('{{ route('news.coinglass.funding') }}').then(r => r.json()),
-                    fetch('{{ route('news.coinglass.open-interest') }}').then(r => r.json()),
-                    fetch('{{ route('news.alchemy.block') }}').then(r => r.json()),
-                    fetch('{{ route('news.cryptoquant.netflow') }}').then(r => r.json()),
-                ])
-                .then(([gas, eth, funding, oi, block, netflow]) => {
-
-                    const data = [{
-                            title: 'ETH Gas',
-                            value: JSON.stringify(gas)
-                        },
-                        {
-                            title: 'ETH Price',
-                            value: JSON.stringify(eth)
-                        },
-                        {
-                            title: 'Funding Rate',
-                            value: JSON.stringify(funding)
-                        },
-                        {
-                            title: 'Open Interest',
-                            value: JSON.stringify(oi)
-                        },
-                        {
-                            title: 'Latest Block',
-                            value: JSON.stringify(block)
-                        },
-                        {
-                            title: 'Exchange Netflow',
-                            value: JSON.stringify(netflow)
-                        }
-                    ];
-
-
-                    document.getElementById('onchain-data').innerHTML =
-                        data.map(item => `
-
-                        <div class="flex justify-between border-b border-base-300 py-2 text-xs">
-
-                            <span>${item.title}</span>
-
-                            <span class="font-mono truncate max-w-[150px]">
-                                ${item.value}
-                            </span>
-
-                        </div>
-
-                        `).join('');
-
-                });
-
             let webcams = [];
-
 
             fetch("{{ route('news.webcams') }}")
                 .then(response => response.json())
@@ -626,37 +543,6 @@
 
                 });
 
-            fetch('{{ route('news.commodity') }}')
-                .then(r => r.json())
-                .then(data => {
-
-
-                    renderNews(
-                        document.getElementById('commodity-gold'),
-                        data.gold || []
-                    );
-
-
-                    renderNews(
-                        document.getElementById('commodity-energy'),
-                        data.energy || []
-                    );
-
-
-                    renderNews(
-                        document.getElementById('commodity-agriculture'),
-                        data.agriculture || []
-                    );
-
-
-                    renderNews(
-                        document.getElementById('commodity-market'),
-                        data.market || []
-                    );
-
-
-                });
-
 
 
             function renderWebcams(region) {
@@ -681,40 +567,32 @@
                             </span>
                         </div>
 
+                        ${
+                            webcam.video_id
+                            ?
+                            `
+                            <iframe
+                                src="https://www.youtube.com/embed/${webcam.video_id}"
+                                class="w-full aspect-video"
+                                frameborder="0"
+                                allowfullscreen>
+                            </iframe>
+                            `
+                            :
+                            `
+                            <div class="aspect-video flex items-center justify-center">
+                                <span class="text-xs text-error">
+                                    Offline
+                                </span>
+                            </div>
+                            `
+                        }
 
-            ${
-                webcam.video_id
+                    </div>
 
-                ?
-
-                `
-                                        <iframe
-                                            src="https://www.youtube.com/embed/${webcam.video_id}"
-                                            class="w-full aspect-video"
-                                            frameborder="0"
-                                            allowfullscreen>
-                                        </iframe>
-                                        `
-
-                :
-
-                `
-                                        <div class="aspect-video flex items-center justify-center">
-                                            <span class="text-xs text-error">
-                                                Offline
-                                            </span>
-                                        </div>
-                                 `
-
-            }
-
-        </div>
-
-    `).join('');
+                `).join('');
 
             }
         });
     </script>
 </x-layout.app>
-
-{{-- m --}}

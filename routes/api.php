@@ -95,25 +95,4 @@ Route::prefix('news')->group(function () {
 
     Route::get('/markets/funding-rates', [NewsController::class, 'getMarketsFundingRates'])
         ->name('news.markets.funding-rates');
-
-    // ============ MACRO ============
-
-    Route::get('/macro/government', [NewsController::class, 'getGovernmentNews'])
-        ->name('news.macro.government');
-
-    Route::get('/macro/trump', [NewsController::class, 'getTrumpNews'])
-        ->name('news.macro.trump');
-
-    Route::get('/macro/fed', [NewsController::class, 'getFedLive'])
-        ->name('news.macro.fed');
-
-    Route::get('/macro/markets', [NewsController::class, 'getMacroMarkets'])
-        ->name('news.macro.markets');
-
-
-    // ============ COMMODITY ============
-
-    Route::get('/commodity', [NewsController::class, 'getCommodityNews'])
-        ->name('news.commodity');
-
 });
