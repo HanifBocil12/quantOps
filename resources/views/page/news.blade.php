@@ -52,27 +52,6 @@
         </div>
 
         <div class="card bg-base-200 border border-base-300 h-full w-full">
-            <div class="card-body p-4 h-full w-full">
-
-                <h3 class="text-sm font-semibold text-base-content/70">
-                    Crypto news
-                </h3>
-
-                <div id="crypto-news" class="mt-2 space-y-3 flex-1 overflow-hidden">
-
-                    <div id="crypto-onchain" class="max-h-[140px] overflow-y-auto pr-1">
-                    </div>
-
-                    <div id="crypto-general" class="max-h-[140px] overflow-y-auto pr-1">
-                    </div>
-
-
-                </div>
-
-            </div>
-        </div>
-
-        <div class="card bg-base-200 border border-base-300 h-full w-full">
             <div class="card-body p-4 h-full w-full overflow-hidden">
                 <h3 class="text-sm font-semibold text-base-content/70">
                     World news
@@ -424,23 +403,23 @@
                 ?
 
                 `
-                                                                <iframe
-                                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                    class="w-full aspect-video"
-                                                                    frameborder="0"
-                                                                    allowfullscreen>
-                                                                </iframe>
-                                                                `
+                                                                    <iframe
+                                                                        src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                        class="w-full aspect-video"
+                                                                        frameborder="0"
+                                                                        allowfullscreen>
+                                                                    </iframe>
+                                                                    `
 
                 :
 
                 `
-                                                                <div class="aspect-video flex items-center justify-center">
-                                                                    <span class="text-xs text-error">
-                                                                        Offline
-                                                                    </span>
-                                                                </div>
-                                                                `
+                                                                    <div class="aspect-video flex items-center justify-center">
+                                                                        <span class="text-xs text-error">
+                                                                            Offline
+                                                                        </span>
+                                                                    </div>
+                                                                    `
 
             }
 
