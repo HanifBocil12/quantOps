@@ -320,8 +320,8 @@
 
                 if (!data || !data.transactions || data.transactions.length === 0) {
                     el.innerHTML = `
-                        <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Whale Tx (&gt;100 ETH)</p>
-                        <p class="text-xs text-base-content/40">No whale tx in latest block</p>
+                        <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Whale Tx</p>
+                        <p class="text-xs text-base-content/40">No whale tx in recent blocks</p>
                     `;
                     return;
                 }
@@ -329,19 +329,19 @@
                 const shortAddr = (addr) => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '-';
 
                 el.innerHTML = `
-                        <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">
-                            Whale Tx (&gt;100 ETH) — Block #${data.block_number.toLocaleString()}
-                        </p>
-                        ${data.transactions.map(tx => `
-                                        <a href="https://etherscan.io/tx/${tx.hash}" target="_blank"
-                                        class="block border-b border-base-300 pb-1.5 mb-1.5 hover:opacity-80 transition last:border-0">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs font-mono text-base-content/80">${shortAddr(tx.from)} → ${shortAddr(tx.to)}</span>
-                                                <span class="text-xs font-mono text-green-500">${tx.value_eth} ETH</span>
-                                            </div>
-                                        </a>
-                                    `).join('')}
-                    `;
+                    <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">
+                        Whale Tx — Block #${data.block_range.from.toLocaleString()}–#${data.block_range.to.toLocaleString()}
+                    </p>
+                    ${data.transactions.map(tx => `
+                                <a href="https://etherscan.io/tx/${tx.hash}" target="_blank"
+                                class="block border-b border-base-300 pb-1.5 mb-1.5 hover:opacity-80 transition last:border-0">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono text-base-content/80">${shortAddr(tx.from)} → ${shortAddr(tx.to)}</span>
+                                        <span class="text-xs font-mono text-green-500">${tx.value_eth} ETH</span>
+                                    </div>
+                                </a>
+                            `).join('')}
+                `;
             }
 
             fetch('{{ route('news.alchemy.whale-tx') }}')
@@ -413,11 +413,11 @@
                 el.innerHTML = `
                     <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Chain TVL</p>
                     ${items.map(item => `
-                                                            <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
-                                                                <span class="text-xs text-base-content/80">${item.name}</span>
-                                                                <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
-                                                            </div>
-                                                        `).join('')}
+                                                                    <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
+                                                                        <span class="text-xs text-base-content/80">${item.name}</span>
+                                                                        <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
+                                                                    </div>
+                                                                `).join('')}
                 `;
             }
 
@@ -663,21 +663,21 @@
                             webcam.video_id
                             ?
                             `
-                                                                <iframe
-                                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                    class="w-full aspect-video"
-                                                                    frameborder="0"
-                                                                    allowfullscreen>
-                                                                </iframe>
-                                                                `
+                                                                        <iframe
+                                                                            src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                            class="w-full aspect-video"
+                                                                            frameborder="0"
+                                                                            allowfullscreen>
+                                                                        </iframe>
+                                                                        `
                             :
                             `
-                                                                <div class="aspect-video flex items-center justify-center">
-                                                                    <span class="text-xs text-error">
-                                                                        Offline
-                                                                    </span>
-                                                                </div>
-                                                                `
+                                                                        <div class="aspect-video flex items-center justify-center">
+                                                                            <span class="text-xs text-error">
+                                                                                Offline
+                                                                            </span>
+                                                                        </div>
+                                                                        `
                         }
 
                     </div>
