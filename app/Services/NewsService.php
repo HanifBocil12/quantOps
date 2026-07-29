@@ -340,7 +340,7 @@ class NewsService
     {
         return array_values(array_filter([
             env('YOUTUBE_API_KEY'),
-            env('YOUTUBE_API_KEY_2'),
+            env('YOUTUBE_API_KEY_1'),
         ]));
     }
 
