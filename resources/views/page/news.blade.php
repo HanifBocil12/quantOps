@@ -15,7 +15,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-100 shadow-sm border border-base-300 h-[400px]">
+        <div class="card bg-base-100 shadow-sm border border-line-new h-[400px]">
             <div class="card-body p-4 h-full">
 
                 <h3 class="text-sm font-semibold text-base-content/70">
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
+        <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Crypto news</h3>
                 <div id="crypto-news" class="mt-2 space-y-3 flex-1 overflow-hidden">
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-full w-full">
+        <div class="card border border-line-new h-full w-full">
             <div class="card-body p-4 h-full w-full overflow-hidden">
                 <h3 class="text-sm font-semibold text-base-content/70">
                     World news
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
+        <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Markets</h3>
                 <div id="markets-news" class="mt-2 space-y-1 flex-1 overflow-y-auto">
@@ -84,7 +84,7 @@
         </div>
 
         {{-- Row 2 - Macro economic news (larger) --}}
-        <div class="card bg-base-200 border border-base-300 lg:col-span-2 h-[400px] w-full">
+        <div class="card border border-line-new lg:col-span-2 h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70 mb-3">Macro economic news</h3>
                 <div class="tabs tabs-boxed bg-base-300 mb-3">
@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
+        <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">Onchain data</h3>
                 <div id="onchain-data" class="mt-2 space-y-2 flex-1 overflow-y-auto">
@@ -126,7 +126,7 @@
             </div>
         </div>
 
-        <div class="card bg-base-200 border border-base-300 h-[400px] w-full">
+        <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">War</h3>
                 <div class="mt-2 space-y-2 flex-1">
@@ -141,7 +141,7 @@
         </div>
 
         {{-- Row 3 - Komoditas (full width) --}}
-        <div class="card bg-base-200 border border-base-300 lg:col-span-4 h-[200px] w-full">
+        <div class="card border border-line-new lg:col-span-4 h-[200px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70 mb-3">Komoditas</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full">
