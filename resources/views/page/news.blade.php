@@ -289,6 +289,80 @@
                 renderNews(el, items);
             }
 
+            function renderOnchainData(el, items) {
+                renderNews(el, items);
+            }
+
+            // ============ TAMBAHIN 3 FUNCTION INI DI SINI ============
+
+            function buildSparkline(points) {
+                if (!points || points.length < 2) return '';
+
+                const min = Math.min(...points);
+                const max = Math.max(...points);
+                const range = max - min || 1;
+                const width = 60;
+                const height = 24;
+
+                const coords = points.map((p, i) => {
+                    const x = (i / (points.length - 1)) * width;
+                    const y = height - ((p - min) / range) * height;
+                    return `${x.toFixed(1)},${y.toFixed(1)}`;
+                }).join(' ');
+
+                const isUp = points[points.length - 1] >= points[0];
+                const color = isUp ? '#22c55e' : '#ef4444';
+
+                return `
+                    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" class="shrink-0">
+                        <polyline points="${coords}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" />
+                    </svg>
+                `;
+            }
+
+            function formatWatchlistPrice(price) {
+                if (price >= 1000) return price.toLocaleString('en-US', {
+                    maximumFractionDigits: 0
+                });
+                if (price >= 1) return price.toFixed(2);
+                return price.toFixed(6);
+            }
+
+            function renderMarketsWatchlist(items) {
+                const el = document.getElementById('markets-news');
+
+                if (!el) return;
+
+                if (!items.length) {
+                    el.innerHTML = '<p class="text-xs text-base-content/40">No data available</p>';
+                    return;
+                }
+
+                el.innerHTML = items.map(item => {
+                    const isUp = item.change_pct >= 0;
+                    const changeColor = isUp ? 'text-green-500' : 'text-red-500';
+                    const changeSign = isUp ? '+' : '';
+
+                    return `
+                        <div class="flex items-center justify-between py-2.5 border-b border-base-300 last:border-0 hover:bg-base-300/30 transition rounded px-1 -mx-1">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium">${item.symbol}</span>
+                                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">${item.pair}</span>
+                            </div>
+
+                            ${buildSparkline(item.sparkline)}
+
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm font-mono">$${formatWatchlistPrice(item.price)}</span>
+                                <span class="text-xs font-mono ${changeColor}">${changeSign}${item.change_pct.toFixed(2)}%</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // ============ SAMPE SINI ============
+
             fetch('{{ route('news.index') }}')
                 .then(r => r.json())
                 .then(news => {
@@ -308,6 +382,7 @@
                     document.getElementById('markets-news').innerHTML =
                         '<p class="text-xs text-base-content/40">Failed to load</p>';
                 });
+
 
             fetch('{{ route('news.world') }}')
                 .then(r => r.json())
@@ -410,23 +485,23 @@
                 ?
 
                 `
-                                                                            <iframe
-                                                                                src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                                class="w-full aspect-video"
-                                                                                frameborder="0"
-                                                                                allowfullscreen>
-                                                                            </iframe>
-                                                                            `
+                                                                                <iframe
+                                                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                                    class="w-full aspect-video"
+                                                                                    frameborder="0"
+                                                                                    allowfullscreen>
+                                                                                </iframe>
+                                                                                `
 
                 :
 
                 `
-                                                                            <div class="aspect-video flex items-center justify-center">
-                                                                                <span class="text-xs text-error">
-                                                                                    Offline
-                                                                                </span>
-                                                                            </div>
-                                                                            `
+                                                                                <div class="aspect-video flex items-center justify-center">
+                                                                                    <span class="text-xs text-error">
+                                                                                        Offline
+                                                                                    </span>
+                                                                                </div>
+                                                                                `
 
             }
 
