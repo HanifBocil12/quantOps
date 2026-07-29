@@ -60,7 +60,7 @@
 
                 <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 max-h-[300px] overflow-y-auto pr-1">
 
-                    <p class="text-xs text-base-content/40">
+                    <p class="text-xs max-h-[140px] text-base-content/40">
                         Loading webcams...
                     </p>
 
