@@ -569,17 +569,17 @@
                     document.getElementById('onchain-data').innerHTML =
                         data.map(item => `
 
-        <div class="flex justify-between border-b border-base-300 py-2 text-xs">
+                        <div class="flex justify-between border-b border-base-300 py-2 text-xs">
 
-            <span>${item.title}</span>
+                            <span>${item.title}</span>
 
-            <span class="font-mono truncate max-w-[150px]">
-                ${item.value}
-            </span>
+                            <span class="font-mono truncate max-w-[150px]">
+                                ${item.value}
+                            </span>
 
-        </div>
+                        </div>
 
-        `).join('');
+                        `).join('');
 
                 });
 
