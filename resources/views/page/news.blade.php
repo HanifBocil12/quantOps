@@ -114,19 +114,19 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3 h-full">
                     <div
-                        class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
+                        class="bg-gradient-to-br from-unggugelap to-base-200 rounded p-4 flex items-center justify-center">
                         <div class="text-xs text-base-content/70">Live news</div>
                     </div>
                     <div
-                        class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
+                        class="bg-gradient-to-br from-unggugelap to-base-200 rounded p-4 flex items-center justify-center">
                         <div class="text-xs text-base-content/70">The fed live</div>
                     </div>
                     <div
-                        class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
+                        class="bg-gradient-to-br from-unggugelap to-base-200 rounded p-4 flex items-center justify-center">
                         <div class="text-xs text-base-content/70">Trump live</div>
                     </div>
                     <div
-                        class="bg-gradient-to-br from-red-900/50 to-base-200 rounded p-4 flex items-center justify-center">
+                        class="bg-gradient-to-br from-unggugelap to-base-200 rounded p-4 flex items-center justify-center">
                         <div class="text-xs text-base-content/70">Markets</div>
                     </div>
                 </div>
