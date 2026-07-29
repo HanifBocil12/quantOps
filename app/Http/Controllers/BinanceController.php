@@ -31,7 +31,7 @@ class BinanceController extends Controller
     public function watchlist(): JsonResponse
     {
         return response()->json(
-            $this->binance->getWatchlist(['BTCUSDT', 'ETHUSDT', 'BNBUSDT'])
+            $this->binance->getWatchlist(['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'TRXUSDT', 'SOLUSDT'])
         );
     }
 }
