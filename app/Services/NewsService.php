@@ -697,9 +697,9 @@ class NewsService
     // ALCHEMY (JSON-RPC, bukan REST)
     // ============================================================
 
-    public function getAlchemyWhaleTransactions(float $minEth = 100): array
+    public function getAlchemyWhaleTransactions(float $minEth = 100, int $blockCount = 5): array
     {
-        return Cache::remember("alchemy_whale_tx_{$minEth}", now()->addMinutes(2), function () use ($minEth) {
+        return Cache::remember("alchemy_whale_tx_{$minEth}_{$blockCount}", now()->addMinutes(2), function () use ($minEth, $blockCount) {
             try {
                 // 1. Ambil block number terbaru
                 $blockNumberResponse = Http::timeout(10)
@@ -715,55 +715,73 @@ class NewsService
                     return [];
                 }
 
-                $latestBlockHex = $blockNumberResponse->json('result');
+                $latestBlockDec = hexdec($blockNumberResponse->json('result'));
 
-                if (!$latestBlockHex) {
-                    return [];
-                }
-
-                // 2. Ambil block lengkap dengan semua transaksinya
-                $blockResponse = Http::timeout(15)
-                    ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
-                        'jsonrpc' => '2.0',
-                        'method'  => 'eth_getBlockByNumber',
-                        'params'  => [$latestBlockHex, true], // true = full transaction objects
-                        'id'      => 1,
-                    ]);
-
-                if (!$blockResponse->successful()) {
-                    Log::warning('Alchemy whale tx: block detail fetch failed');
-                    return [];
-                }
-
-                $block = $blockResponse->json('result');
-
-                if (!$block || empty($block['transactions'])) {
+                if (!$latestBlockDec) {
                     return [];
                 }
 
                 $minWei = $minEth * 1e18;
+                $allWhaleTxs = [];
 
-                $whaleTxs = collect($block['transactions'])
-                    ->filter(function ($tx) use ($minWei) {
-                        $valueWei = hexdec($tx['value'] ?? '0x0');
-                        return $valueWei >= $minWei;
-                    })
-                    ->map(function ($tx) {
-                        $valueEth = hexdec($tx['value']) / 1e18;
+                // 2. Loop scan beberapa block terakhir, pakai Http::pool biar paralel
+                $blockNumbers = range($latestBlockDec, $latestBlockDec - ($blockCount - 1));
 
-                        return [
-                            'hash'  => $tx['hash'] ?? null,
-                            'from'  => $tx['from'] ?? null,
-                            'to'    => $tx['to'] ?? null,
-                            'value_eth' => round($valueEth, 4),
-                        ];
-                    })
-                    ->values()
-                    ->toArray();
+                $responses = Http::pool(function ($pool) use ($blockNumbers) {
+                    foreach ($blockNumbers as $bn) {
+                        $pool->as((string) $bn)
+                            ->timeout(15)
+                            ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
+                                'jsonrpc' => '2.0',
+                                'method'  => 'eth_getBlockByNumber',
+                                'params'  => ['0x' . dechex($bn), true],
+                                'id'      => 1,
+                            ]);
+                    }
+                });
+
+                foreach ($blockNumbers as $bn) {
+                    $response = $responses[(string) $bn] ?? null;
+
+                    if (!$response || $response instanceof \Throwable || !$response->successful()) {
+                        continue;
+                    }
+
+                    $block = $response->json('result');
+
+                    if (!$block || empty($block['transactions'])) {
+                        continue;
+                    }
+
+                    $whaleTxs = collect($block['transactions'])
+                        ->filter(function ($tx) use ($minWei) {
+                            $valueWei = hexdec($tx['value'] ?? '0x0');
+                            return $valueWei >= $minWei;
+                        })
+                        ->map(function ($tx) use ($bn) {
+                            return [
+                                'block_number' => $bn,
+                                'hash'  => $tx['hash'] ?? null,
+                                'from'  => $tx['from'] ?? null,
+                                'to'    => $tx['to'] ?? null,
+                                'value_eth' => round(hexdec($tx['value']) / 1e18, 4),
+                            ];
+                        })
+                        ->values()
+                        ->toArray();
+
+                    $allWhaleTxs = array_merge($allWhaleTxs, $whaleTxs);
+                }
+
+                // Urutkan value terbesar dulu
+                usort($allWhaleTxs, fn($a, $b) => $b['value_eth'] <=> $a['value_eth']);
 
                 return [
-                    'block_number' => hexdec($latestBlockHex),
-                    'transactions' => $whaleTxs,
+                    'block_range' => [
+                        'from' => min($blockNumbers),
+                        'to'   => max($blockNumbers),
+                    ],
+                    'transactions' => array_slice($allWhaleTxs, 0, 20), // cap 20 biar UI gak kepanjangan
                 ];
             } catch (\Exception $e) {
                 Log::warning('Alchemy whale tx error: ' . $e->getMessage());

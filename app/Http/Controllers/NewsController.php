@@ -146,7 +146,7 @@ class NewsController extends Controller
     public function getAlchemyWhaleTx()
     {
         return response()->json(
-            $this->newsService->getAlchemyWhaleTransactions(minEth: 20)
+            $this->newsService->getAlchemyWhaleTransactions(minEth: 50, blockCount: 5)
         );
     }
 
