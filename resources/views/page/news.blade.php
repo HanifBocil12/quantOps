@@ -15,9 +15,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-100 shadow-sm border border-base-300 h-full">
+        <div class="card bg-base-100 shadow-sm border border-base-300 h-[400px] overflow-hidden">
 
-            <div class="card-body p-4 overflow-hidden">
+            <div class="card-body p-4 h-full overflow-hidden">
 
                 <h3 class="text-sm font-semibold text-base-content/70">
                     Live Webcams
@@ -46,7 +46,7 @@
                     </button>
 
 
-                    <button class="tab webcam-tab" data-region="Middle Eastast">
+                    <button class="tab webcam-tab" data-region="Middle East">
                         Middle East
                     </button>
 
@@ -58,13 +58,14 @@
                 </div>
 
 
-                <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 max-h-[300px] overflow-y-auto pr-1">
+                <div id="webcam-grid" class="grid grid-cols-1 gap-3 mt-3 flex-1 overflow-y-auto pr-1">
 
-                    <p class="text-xs max-h-[140px] text-base-content/40">
+                    <p class="text-xs text-base-content/40">
                         Loading webcams...
                     </p>
 
                 </div>
+
             </div>
 
         </div>
@@ -442,23 +443,23 @@
                 ?
 
                 `
-                                                    <iframe
-                                                        src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                        class="w-full aspect-video"
-                                                        frameborder="0"
-                                                        allowfullscreen>
-                                                    </iframe>
-                                                    `
+                                                        <iframe
+                                                            src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                            class="w-full aspect-video"
+                                                            frameborder="0"
+                                                            allowfullscreen>
+                                                        </iframe>
+                                                        `
 
                 :
 
                 `
-                                                    <div class="aspect-video flex items-center justify-center">
-                                                        <span class="text-xs text-error">
-                                                            Offline
-                                                        </span>
-                                                    </div>
-                                                    `
+                                                        <div class="aspect-video flex items-center justify-center">
+                                                            <span class="text-xs text-error">
+                                                                Offline
+                                                            </span>
+                                                        </div>
+                                                        `
 
             }
 
