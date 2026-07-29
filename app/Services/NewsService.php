@@ -353,6 +353,8 @@ class NewsService
             return null;
         }
 
+        $quotaReasons = ['quotaExceeded', 'rateLimitExceeded', 'dailyLimitExceeded', 'userRateLimitExceeded'];
+
         foreach ($keys as $index => $key) {
 
             $response = Http::get(
@@ -387,14 +389,16 @@ class NewsService
 
             $reason = $response->json('error.errors.0.reason');
 
-            if ($reason === 'quotaExceeded') {
-                logger()->warning("YouTube key #{$index} quota exceeded, trying next key", [
+            // Tangkep status 429 (Too Many Requests) juga sebagai sinyal quota,
+            // selain cocokin reason string
+            if ($response->status() === 429 || in_array($reason, $quotaReasons)) {
+                logger()->warning("YouTube key #{$index} quota/rate limit hit, trying next key", [
                     'channelId' => $channelId,
+                    'reason' => $reason,
                 ]);
-                continue; // coba key berikutnya
+                continue;
             }
 
-            // error selain quota (channelId invalid, network, dll) -> stop, gak usah nyoba key lain
             logger()->error('Youtube API Error', [
                 'status' => $response->status(),
                 'body' => $response->json(),
