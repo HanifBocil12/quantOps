@@ -160,14 +160,12 @@ class NewsService
 
         return $allNews;
     }
-
     public function getLiveWebcams(): array
     {
         return Cache::remember(
             'youtube_live_webcams',
-            now()->addMinutes(15),
+            now()->addHours(6), // dari 15 menit -> 6 jam, ini yg paling nentuin hemat quota
             function () {
-
                 return $this->fetchLiveWebcams();
             }
         );
@@ -216,12 +214,12 @@ class NewsService
                 ]
             ],
 
-            // ASIA - PAKE WEBCAM CHANNEL!
+            // ASIA
             'Tokyo' => [
                 'region' => 'Asia',
                 'channels' => [
-                    'UCXeB_-XGzPjOmc5aOwGHC9A', // TOKYO Live Camera TV ✅
-                    'UC8oWZuLFc_eBA0LmgWFA2Rw', // Suginami River Live Cam ✅
+                    'UCXeB_-XGzPjOmc5aOwGHC9A', // TOKYO Live Camera TV
+                    'UC8oWZuLFc_eBA0LmgWFA2Rw', // Suginami River Live Cam
                 ]
             ],
             'Singapore' => [
@@ -274,7 +272,6 @@ class NewsService
                 }
             }
 
-
             $result[] = [
                 'city' => $city,
                 'region' => $config['region'],
@@ -288,50 +285,77 @@ class NewsService
         return $result;
     }
 
+    protected function getYoutubeKeys(): array
+    {
+        return array_values(array_filter([
+            env('YOUTUBE_API_KEY'),
+            env('YOUTUBE_API_KEY_2'),
+        ]));
+    }
 
     protected function searchYoutubeLive(string $channelId): ?array
     {
-        $response = Http::get(
-            'https://www.googleapis.com/youtube/v3/search',
-            [
-                'key' => env('YOUTUBE_API_KEY'),
-                'channelId' => $channelId,
-                'part' => 'snippet',
-                'eventType' => 'live',
-                'type' => 'video',
-                'maxResults' => 1,
-            ]
-        );
+        $keys = $this->getYoutubeKeys();
 
+        if (empty($keys)) {
+            logger()->error('No YouTube API keys configured');
+            return null;
+        }
 
-        if ($response->failed()) {
+        foreach ($keys as $index => $key) {
 
+            $response = Http::get(
+                'https://www.googleapis.com/youtube/v3/search',
+                [
+                    'key' => $key,
+                    'channelId' => $channelId,
+                    'part' => 'snippet',
+                    'eventType' => 'live',
+                    'type' => 'video',
+                    'maxResults' => 1,
+                ]
+            );
+
+            if ($response->successful()) {
+
+                $data = $response->json();
+
+                if (empty($data['items'])) {
+                    return null;
+                }
+
+                $item = $data['items'][0];
+
+                return [
+                    'videoId' => $item['id']['videoId'],
+                    'title' => $item['snippet']['title'],
+                    'thumbnail' => $item['snippet']['thumbnails']['high']['url'] ?? null,
+                    'status' => 'live',
+                ];
+            }
+
+            $reason = $response->json('error.errors.0.reason');
+
+            if ($reason === 'quotaExceeded') {
+                logger()->warning("YouTube key #{$index} quota exceeded, trying next key", [
+                    'channelId' => $channelId,
+                ]);
+                continue; // coba key berikutnya
+            }
+
+            // error selain quota (channelId invalid, network, dll) -> stop, gak usah nyoba key lain
             logger()->error('Youtube API Error', [
                 'status' => $response->status(),
-                'body' => $response->json()
+                'body' => $response->json(),
+                'channelId' => $channelId,
             ]);
 
             return null;
         }
 
+        logger()->error("All YouTube API keys exhausted for channel: {$channelId}");
 
-        $data = $response->json();
-
-
-        if (empty($data['items'])) {
-            return null;
-        }
-
-
-        $item = $data['items'][0];
-
-
-        return [
-            'videoId' => $item['id']['videoId'],
-            'title' => $item['snippet']['title'],
-            'thumbnail' => $item['snippet']['thumbnails']['high']['url'] ?? null,
-            'status' => 'live',
-        ];
+        return null;
     }
 
     protected function categorizeGeneralNews(array $news): array
