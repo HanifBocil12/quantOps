@@ -288,8 +288,10 @@ class NewsService
             return $allNews;
         }
 
-        $responses = Http::pool(fn ($pool) =>
-            collect($feeds)->map(fn ($url, $source) =>
+        $responses = Http::pool(
+            fn($pool) =>
+            collect($feeds)->map(
+                fn($url, $source) =>
                 $pool->as($source)->timeout(5)->get($url)
             )->toArray()
         );
@@ -323,6 +325,431 @@ class NewsService
 
         return $allNews;
     }
+    //TODO CRYPTO
+    // ============ COINGECKO (keyless) ============
+
+    public function getCoinGeckoTrending(): array
+    {
+        return Cache::remember('coingecko_trending', now()->addMinutes(15), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->get('https://api.coingecko.com/api/v3/search/trending');
+
+                if (!$response->successful()) {
+                    Log::warning('CoinGecko trending fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $data = $response->json('coins', []);
+
+                return collect($data)
+                    ->map(fn($c) => [
+                        'id'         => $c['item']['id'] ?? null,
+                        'symbol'     => strtoupper($c['item']['symbol'] ?? ''),
+                        'name'       => $c['item']['name'] ?? '',
+                        'rank'       => $c['item']['market_cap_rank'] ?? null,
+                        'thumb'      => $c['item']['thumb'] ?? null,
+                        'price_usd'  => $c['item']['data']['price'] ?? null,
+                        'change_24h' => $c['item']['data']['price_change_percentage_24h']['usd'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('CoinGecko trending error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    public function getCoinGeckoGlobal(): array
+    {
+        return Cache::remember('coingecko_global', now()->addMinutes(15), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->get('https://api.coingecko.com/api/v3/global');
+
+                if (!$response->successful()) {
+                    Log::warning('CoinGecko global fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $data = $response->json('data', []);
+
+                return [
+                    'total_market_cap_usd'   => $data['total_market_cap']['usd'] ?? null,
+                    'total_volume_usd'       => $data['total_volume']['usd'] ?? null,
+                    'btc_dominance'          => $data['market_cap_percentage']['btc'] ?? null,
+                    'eth_dominance'          => $data['market_cap_percentage']['eth'] ?? null,
+                    'market_cap_change_24h'  => $data['market_cap_change_percentage_24h_usd'] ?? null,
+                    'active_cryptocurrencies' => $data['active_cryptocurrencies'] ?? null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('CoinGecko global error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ DEFILLAMA (keyless) ============
+
+    public function getDefiLlamaChainsTvl(int $limit = 10): array
+    {
+        return Cache::remember('defillama_chains_tvl', now()->addMinutes(15), function () use ($limit) {
+            try {
+                $response = Http::timeout(10)
+                    ->get('https://api.llama.fi/v2/chains');
+
+                if (!$response->successful()) {
+                    Log::warning('DefiLlama chains fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                return collect($response->json())
+                    ->sortByDesc('tvl')
+                    ->take($limit)
+                    ->map(fn($c) => [
+                        'name' => $c['name'] ?? '',
+                        'tvl'  => $c['tvl'] ?? 0,
+                        'token_symbol' => $c['tokenSymbol'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('DefiLlama chains error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    public function getDefiLlamaTopProtocols(int $limit = 10): array
+    {
+        return Cache::remember('defillama_protocols_tvl', now()->addMinutes(15), function () use ($limit) {
+            try {
+                $response = Http::timeout(10)
+                    ->get('https://api.llama.fi/protocols');
+
+                if (!$response->successful()) {
+                    Log::warning('DefiLlama protocols fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                return collect($response->json())
+                    ->sortByDesc('tvl')
+                    ->take($limit)
+                    ->map(fn($p) => [
+                        'name'     => $p['name'] ?? '',
+                        'symbol'   => $p['symbol'] ?? null,
+                        'chain'    => $p['chain'] ?? null,
+                        'category' => $p['category'] ?? null,
+                        'tvl'      => $p['tvl'] ?? 0,
+                        'change_1d' => $p['change_1d'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('DefiLlama protocols error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ DERIBIT (keyless, endpoint public) ============
+
+    public function getDeribitIndexPrices(): array
+    {
+        return Cache::remember('deribit_index_prices', now()->addMinutes(5), function () {
+            $indices = ['btc_usd', 'eth_usd'];
+            $result = [];
+
+            foreach ($indices as $index) {
+                try {
+                    $response = Http::timeout(10)
+                        ->get('https://www.deribit.com/api/v2/public/get_index_price', [
+                            'index_name' => $index,
+                        ]);
+
+                    if (!$response->successful()) {
+                        Log::warning("Deribit index fetch failed for {$index}", ['status' => $response->status()]);
+                        continue;
+                    }
+
+                    $data = $response->json('result');
+
+                    if ($data) {
+                        $result[] = [
+                            'index' => strtoupper($index),
+                            'price' => $data['index_price'] ?? null,
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Deribit index error for {$index}: " . $e->getMessage());
+                    continue;
+                }
+            }
+
+            return $result;
+        });
+    }
+
+    public function getDeribitOptionsSummary(string $currency = 'BTC'): array
+    {
+        return Cache::remember("deribit_options_summary_{$currency}", now()->addMinutes(10), function () use ($currency) {
+            try {
+                $response = Http::timeout(10)
+                    ->get('https://www.deribit.com/api/v2/public/get_book_summary_by_currency', [
+                        'currency' => $currency,
+                        'kind' => 'option',
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Deribit options summary fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                return collect($response->json('result', []))
+                    ->sortByDesc('volume')
+                    ->take(10)
+                    ->map(fn($o) => [
+                        'instrument' => $o['instrument_name'] ?? '',
+                        'volume'     => $o['volume'] ?? 0,
+                        'mark_price' => $o['mark_price'] ?? null,
+                        'open_interest' => $o['open_interest'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('Deribit options summary error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ ETHERSCAN ============
+
+    public function getEtherscanGasOracle(): array
+    {
+        return Cache::remember('etherscan_gas_oracle', now()->addMinutes(2), function () {
+            try {
+                $response = Http::timeout(10)->get('https://api.etherscan.io/api', [
+                    'module' => 'gastracker',
+                    'action' => 'gasoracle',
+                    'apikey' => env('ETHERSCAN_API_KEY'),
+                ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Etherscan gas oracle fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $result = $response->json('result');
+
+                if (!$result) {
+                    return [];
+                }
+
+                return [
+                    'safe_gwei'     => $result['SafeGasPrice'] ?? null,
+                    'propose_gwei'  => $result['ProposeGasPrice'] ?? null,
+                    'fast_gwei'     => $result['FastGasPrice'] ?? null,
+                    'base_fee'      => $result['suggestBaseFee'] ?? null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('Etherscan gas oracle error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    public function getEtherscanEthPrice(): array
+    {
+        return Cache::remember('etherscan_eth_price', now()->addMinutes(5), function () {
+            try {
+                $response = Http::timeout(10)->get('https://api.etherscan.io/api', [
+                    'module' => 'stats',
+                    'action' => 'ethprice',
+                    'apikey' => env('ETHERSCAN_API_KEY'),
+                ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Etherscan eth price fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $result = $response->json('result');
+
+                return [
+                    'eth_usd' => $result['ethusd'] ?? null,
+                    'eth_btc' => $result['ethbtc'] ?? null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('Etherscan eth price error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ COINGLASS ============
+
+    public function getCoinglassFundingRates(): array
+    {
+        return Cache::remember('coinglass_funding_rates', now()->addMinutes(5), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['CG-API-KEY' => env('COINGLASS_API_KEY')])
+                    ->get('https://open-api-v4.coinglass.com/api/futures/funding-rate/exchange-list', [
+                        'symbol' => 'BTC',
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Coinglass funding rate fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                return collect($response->json('data', []))
+                    ->take(10)
+                    ->map(fn($item) => [
+                        'exchange' => $item['exchangeName'] ?? '',
+                        'funding_rate' => $item['fundingRate'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('Coinglass funding rate error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    public function getCoinglassOpenInterest(): array
+    {
+        return Cache::remember('coinglass_open_interest', now()->addMinutes(5), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['CG-API-KEY' => env('COINGLASS_API_KEY')])
+                    ->get('https://open-api-v4.coinglass.com/api/futures/open-interest/exchange-list', [
+                        'symbol' => 'BTC',
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Coinglass open interest fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                return collect($response->json('data', []))
+                    ->take(10)
+                    ->map(fn($item) => [
+                        'exchange' => $item['exchangeName'] ?? '',
+                        'open_interest_usd' => $item['openInterestUsd'] ?? null,
+                    ])
+                    ->values()
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::warning('Coinglass open interest error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ ALCHEMY (JSON-RPC, bukan REST) ============
+
+    public function getAlchemyLatestBlock(): array
+    {
+        return Cache::remember('alchemy_latest_block', now()->addMinutes(1), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
+                        'jsonrpc' => '2.0',
+                        'method'  => 'eth_blockNumber',
+                        'params'  => [],
+                        'id'      => 1,
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Alchemy latest block fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $hex = $response->json('result');
+
+                return [
+                    'block_number' => $hex ? hexdec($hex) : null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('Alchemy latest block error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    public function getAlchemyGasPrice(): array
+    {
+        return Cache::remember('alchemy_gas_price', now()->addMinutes(2), function () {
+            try {
+                $response = Http::timeout(10)
+                    ->post('https://eth-mainnet.g.alchemy.com/v2/' . env('ALCHEMY_API_KEY'), [
+                        'jsonrpc' => '2.0',
+                        'method'  => 'eth_gasPrice',
+                        'params'  => [],
+                        'id'      => 1,
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('Alchemy gas price fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $hex = $response->json('result');
+
+                return [
+                    'gas_price_wei' => $hex ? hexdec($hex) : null,
+                    'gas_price_gwei' => $hex ? hexdec($hex) / 1e9 : null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('Alchemy gas price error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    // ============ CRYPTOQUANT ============
+
+    public function getCryptoQuantExchangeNetflow(string $exchange = 'binance', string $symbol = 'btc'): array
+    {
+        return Cache::remember("cryptoquant_netflow_{$exchange}_{$symbol}", now()->addMinutes(15), function () use ($exchange, $symbol) {
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['Authorization' => 'Bearer ' . env('CRYPTOQUANT_API_KEY')])
+                    ->get("https://api.cryptoquant.com/v1/{$symbol}/exchange-flows/netflow", [
+                        'exchange' => $exchange,
+                        'window' => 'hour',
+                        'limit' => 1,
+                    ]);
+
+                if (!$response->successful()) {
+                    Log::warning('CryptoQuant netflow fetch failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $latest = $response->json('result.data.0');
+
+                if (!$latest) {
+                    return [];
+                }
+
+                return [
+                    'exchange' => $exchange,
+                    'symbol'   => strtoupper($symbol),
+                    'netflow'  => $latest['netflow_total'] ?? null,
+                    'date'     => $latest['date'] ?? null,
+                ];
+            } catch (\Exception $e) {
+                Log::warning('CryptoQuant netflow error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    //TODO YOUTUBE
 
     public function getLiveWebcams(): array
     {
