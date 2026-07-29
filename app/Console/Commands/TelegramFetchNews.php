@@ -34,25 +34,50 @@ class TelegramFetchNews extends Command
         'guardian',
     ];
 
+    protected array $channelsWar = [
+        'OSINTdefender',
+        'WorldNewsBreaking',
+        'dwglavnoe',
+        'AJEnglish',
+        'WarfareAnalysis',
+        'warnews',
+        'guardian',
+        'GlobalNewsMonitor',
+        'BBCWorld',
+        'ReutersWorldChannel',
+    ];
+
     public function handle(): int
     {
         $cryptoNews = [];
         $worldNews = [];
-        $debug = [];
+        $warNews = [];
 
-        $this->fetchChannels($this->channels, $cryptoNews, $debug);
-        $this->fetchChannels($this->channelsWorld, $worldNews, $debug);
+        $cryptoDebug = [];
+        $worldDebug = [];
+        $warDebug = [];
+
+        $this->fetchChannels($this->channels, $cryptoNews, $cryptoDebug);
+        $this->fetchChannels($this->channelsWorld, $worldNews, $worldDebug);
+        $this->fetchChannels($this->channelsWar, $warNews, $warDebug);
 
         usort($cryptoNews, fn($a, $b) => $b['published'] - $a['published']);
         usort($worldNews, fn($a, $b) => $b['published'] - $a['published']);
+        usort($warNews, fn($a, $b) => $b['published'] - $a['published']);
 
         Cache::put('telegram_news', $cryptoNews, now()->addMinutes(10));
+        Cache::put('telegram_news_debug', $cryptoDebug, now()->addMinutes(10));
+
         Cache::put('telegram_world_news', $worldNews, now()->addMinutes(10));
-        Cache::put('telegram_news_debug', $debug, now()->addMinutes(10));
+        Cache::put('telegram_world_news_debug', $worldDebug, now()->addMinutes(10));
+
+        Cache::put('telegram_war_news', $warNews, now()->addMinutes(10));
+        Cache::put('telegram_war_news_debug', $warDebug, now()->addMinutes(10));
 
         $this->info(
             'Crypto: ' . count($cryptoNews) .
-                ' | World: ' . count($worldNews)
+                ' | World: ' . count($worldNews) .
+                ' | War: ' . count($warNews)
         );
 
         return self::SUCCESS;

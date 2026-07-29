@@ -30,4 +30,5 @@ Route::prefix('news')->group(function () {
         ->name('news.webcams');
 
     Route::get('/watchlist', [BinanceController::class, 'watchlist'])->name('markets.watchlist');
+    Route::get('/war', [NewsController::class, 'getWarNews'])->name('news.war');
 });

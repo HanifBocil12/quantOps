@@ -31,6 +31,11 @@ class NewsController extends Controller
         );
     }
 
+    public function getWarNews()
+    {
+        return response()->json($this->newsService->getWarNews(limit: 10));
+    }
+
 
     public function getWorldNews()
     {

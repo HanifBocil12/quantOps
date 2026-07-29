@@ -132,6 +132,20 @@ class NewsService
         return implode(' ', array_slice(explode(' ', $clean), 0, 10));
     }
 
+    public function getWarNews(int $limit = 20): array
+    {
+        $allNews = array_merge(
+            $this->getRssNews(),
+            Cache::get('telegram_war_news', [])
+        );
+
+        $allNews = $this->filterNews($allNews);
+
+        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
+
+        return array_slice($allNews, 0, $limit);
+    }
+
     protected function getRssNews(): array
     {
         $allNews = [];

@@ -129,7 +129,7 @@
         <div class="card border border-line-new h-[400px] w-full">
             <div class="card-body p-4 h-full w-full">
                 <h3 class="text-sm font-semibold text-base-content/70">War</h3>
-                <div class="mt-2 space-y-2 flex-1">
+                <div id="war-news" class="mt-2 space-y-2 flex-1 overflow-y-auto">
                     <div class="animate-pulse flex space-x-2">
                         <div class="flex-1 space-y-2">
                             <div class="h-2 bg-base-300 rounded"></div>
@@ -292,6 +292,16 @@
             function renderOnchainData(el, items) {
                 renderNews(el, items);
             }
+
+            fetch('{{ route('news.war') }}')
+                .then(r => r.json())
+                .then(news => {
+                    renderNews(document.getElementById('war-news'), news);
+                })
+                .catch(() => {
+                    document.getElementById('war-news').innerHTML =
+                        '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
 
             // ============ TAMBAHIN 3 FUNCTION INI DI SINI ============
 
@@ -485,23 +495,23 @@
                 ?
 
                 `
-                                                                                <iframe
-                                                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                                                    class="w-full aspect-video"
-                                                                                    frameborder="0"
-                                                                                    allowfullscreen>
-                                                                                </iframe>
-                                                                                `
+                                                                                        <iframe
+                                                                                            src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                                                            class="w-full aspect-video"
+                                                                                            frameborder="0"
+                                                                                            allowfullscreen>
+                                                                                        </iframe>
+                                                                                        `
 
                 :
 
                 `
-                                                                                <div class="aspect-video flex items-center justify-center">
-                                                                                    <span class="text-xs text-error">
-                                                                                        Offline
-                                                                                    </span>
-                                                                                </div>
-                                                                                `
+                                                                                        <div class="aspect-video flex items-center justify-center">
+                                                                                            <span class="text-xs text-error">
+                                                                                                Offline
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        `
 
             }
 
