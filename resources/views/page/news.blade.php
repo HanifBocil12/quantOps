@@ -15,7 +15,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-100 shadow-sm border border-line-new h-[400px]">
+        <div class="card shadow-sm border border-line-new h-[400px]">
             <div class="card-body p-4 h-full">
 
                 <h3 class="text-sm font-semibold text-base-content/70">
