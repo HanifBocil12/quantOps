@@ -372,11 +372,11 @@
                 el.innerHTML = `
                     <p class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Chain TVL</p>
                     ${items.map(item => `
-                                        <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
-                                            <span class="text-xs text-base-content/80">${item.name}</span>
-                                            <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
-                                        </div>
-                                    `).join('')}
+                                            <div class="flex items-center justify-between border-b border-base-300 pb-1.5 mb-1.5 last:border-0">
+                                                <span class="text-xs text-base-content/80">${item.name}</span>
+                                                <span class="text-xs font-mono">$${(item.tvl / 1e9).toFixed(2)}B</span>
+                                            </div>
+                                        `).join('')}
                 `;
             }
 
@@ -452,6 +452,22 @@
                     <div class="text-lg font-mono">${gas.gas_price_gwei.toFixed(2)} <span class="text-xs">gwei</span></div>
                 `;
             }
+
+            fetch('{{ route('news.alchemy.block') }}')
+                .then(r => r.json())
+                .then(block => renderAlchemyBlock(block))
+                .catch(() => {
+                    const el = document.getElementById('alchemy-block');
+                    if (el) el.innerHTML = '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
+
+            fetch('{{ route('news.alchemy.gas') }}')
+                .then(r => r.json())
+                .then(gas => renderAlchemyGas(gas))
+                .catch(() => {
+                    const el = document.getElementById('alchemy-gas');
+                    if (el) el.innerHTML = '<p class="text-xs text-base-content/40">Failed to load</p>';
+                });
 
             {{-- ============ FETCH CALLS ============ --}}
 
@@ -606,21 +622,21 @@
                             webcam.video_id
                             ?
                             `
-                                            <iframe
-                                                src="https://www.youtube.com/embed/${webcam.video_id}"
-                                                class="w-full aspect-video"
-                                                frameborder="0"
-                                                allowfullscreen>
-                                            </iframe>
-                                            `
+                                                <iframe
+                                                    src="https://www.youtube.com/embed/${webcam.video_id}"
+                                                    class="w-full aspect-video"
+                                                    frameborder="0"
+                                                    allowfullscreen>
+                                                </iframe>
+                                                `
                             :
                             `
-                                            <div class="aspect-video flex items-center justify-center">
-                                                <span class="text-xs text-error">
-                                                    Offline
-                                                </span>
-                                            </div>
-                                            `
+                                                <div class="aspect-video flex items-center justify-center">
+                                                    <span class="text-xs text-error">
+                                                        Offline
+                                                    </span>
+                                                </div>
+                                                `
                         }
 
                     </div>
