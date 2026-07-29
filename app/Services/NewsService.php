@@ -171,6 +171,59 @@ class NewsService
         );
     }
 
+    public function resolveChannelHandles(): void
+    {
+        $handles = [
+            'Sky News' => 'SkyNews',
+            'Euronews' => 'euronews',
+            'CNA' => 'channelnewsasia',
+            'Al Jazeera English' => 'AlJazeeraEnglish',
+            'NASA' => 'NASA',
+        ];
+
+        foreach ($handles as $label => $handle) {
+            $response = Http::get('https://www.googleapis.com/youtube/v3/channels', [
+                'key' => env('YOUTUBE_API_KEY_1'),
+                'forHandle' => $handle,
+                'part' => 'snippet',
+            ]);
+
+            $item = $response->json('items.0');
+
+            if ($item) {
+                dump("{$label} (@{$handle}) => ID: {$item['id']} | Title: {$item['snippet']['title']}");
+            } else {
+                dump("{$label} (@{$handle}) => NOT FOUND");
+            }
+        }
+    }
+
+    public function validateChannelIds(): void
+    {
+        $ids = [
+            'UC9Ad5PzjArHpf3P2rwFNcVg',
+            'UCupvZG-5ko_eiXAupbDfxWw',
+            'UCX6OQ3DkcsbYNE6H8uQQuVA',
+            'UCknLrEdhRCp1aegoMqRaCZg',
+            'UCBi2mrWuNuyYy4gbM6fU18Q',
+            'UCXeB_-XGzPjOmc5aOwGHC9A',
+            'UC8oWZuLFc_eBA0LmgWFA2Rw',
+            'UCXU9Y8T4pLOu1T7GjVxJ2WQ',
+            'UCp7UxMxM5sNfWjqX9Yj2R_w',
+            'UCQjdC2VqN_L3c1Ml4XQd3Jg',
+            'UCRuCgmzhczsm89jzPtN2Wuw',
+        ];
+
+        $response = Http::get('https://www.googleapis.com/youtube/v3/channels', [
+            'key' => env('YOUTUBE_API_KEY_1'),
+            'id' => implode(',', $ids),
+            'part' => 'snippet',
+        ]);
+
+        dump('STATUS: ' . $response->status());
+        dump($response->json());
+    }
+
     private function fetchLiveWebcams(): array
     {
         $cityChannels = [
@@ -179,21 +232,21 @@ class NewsService
             'London' => [
                 'region' => 'Europe',
                 'channels' => [
-                    'UC9Ad5PzjArHpf3P2rwFNcVg', // Sky News
+                    'UCoMdktPbSTixAyNGwb-UYkQ', // Sky News
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                 ]
             ],
             'Frankfurt' => [
                 'region' => 'Europe',
                 'channels' => [
-                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCSrZ3UV4jOidv8ppoVuvW9Q', // Euronews
                     'UCupvZG-5ko_eiXAupbDfxWw', // CNN
                 ]
             ],
             'Berlin' => [
                 'region' => 'Europe',
                 'channels' => [
-                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCSrZ3UV4jOidv8ppoVuvW9Q', // Euronews
                     'UCknLrEdhRCp1aegoMqRaCZg', // DW News
                 ]
             ],
@@ -218,22 +271,20 @@ class NewsService
             'Tokyo' => [
                 'region' => 'Asia',
                 'channels' => [
-                    'UCXeB_-XGzPjOmc5aOwGHC9A', // TOKYO Live Camera TV
-                    'UC8oWZuLFc_eBA0LmgWFA2Rw', // Suginami River Live Cam
+                    'UCXeB_-XGzPjOmc5aOwGHC9A', // TOKYO Live Camera TV (valid, tapi street journalism vibe)
                 ]
             ],
             'Singapore' => [
                 'region' => 'Asia',
                 'channels' => [
-                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
-                    'UCp7UxMxM5sNfWjqX9Yj2R_w', // ANN News
+                    'UC83jt4dlz1Gjl58fzQrrKZg', // CNA
                 ]
             ],
             'Hong Kong' => [
                 'region' => 'Asia',
                 'channels' => [
-                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
-                    'UCXU9Y8T4pLOu1T7GjVxJ2WQ', // CNA
+                    'UCNye-wNBqNL5ZzHSJj3l8Bg', // Al Jazeera English
+                    'UC83jt4dlz1Gjl58fzQrrKZg', // CNA
                 ]
             ],
 
@@ -241,8 +292,8 @@ class NewsService
             'Dubai' => [
                 'region' => 'Middle East',
                 'channels' => [
-                    'UCQjdC2VqN_L3c1Ml4XQd3Jg', // Al Jazeera
-                    'UCX6OQ3DkcsbYNE6H8uQQuVA', // Euronews
+                    'UCNye-wNBqNL5ZzHSJj3l8Bg', // Al Jazeera English
+                    'UCSrZ3UV4jOidv8ppoVuvW9Q', // Euronews
                 ]
             ],
 
@@ -250,7 +301,7 @@ class NewsService
             'ISS Live' => [
                 'region' => 'Space',
                 'channels' => [
-                    'UCRuCgmzhczsm89jzPtN2Wuw', // NASA
+                    'UCLA_DiR1FfKNvjuUpBHmylQ', // NASA
                 ]
             ],
 
