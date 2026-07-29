@@ -15,7 +15,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 w-full h-full">
 
         {{-- Row 1 --}}
-        <div class="card bg-base-100 shadow-sm border border-base-300 h-full overflow-hidden">
+        <div class="card bg-base-100 shadow-sm border border-base-300 h-full">
 
             <div class="card-body p-4 overflow-hidden">
 
@@ -65,8 +65,6 @@
                     </p>
 
                 </div>
-
-
             </div>
 
         </div>
