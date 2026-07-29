@@ -8,7 +8,96 @@ use Illuminate\Support\Facades\Log;
 
 class NewsService
 {
-    protected array $rssFeeds = [];
+    protected array $rssFeeds = [
+
+        'world' => [
+            'Reuters World' =>
+            'https://www.reutersagency.com/feed/?best-topics=world&post_type=best',
+
+            'BBC World' =>
+            'https://feeds.bbci.co.uk/news/world/rss.xml',
+
+            'Al Jazeera' =>
+            'https://www.aljazeera.com/xml/rss/all.xml',
+        ],
+
+        'crypto' => [
+            'CoinDesk' =>
+            'https://www.coindesk.com/arc/outboundfeeds/rss/',
+
+            'Cointelegraph' =>
+            'https://cointelegraph.com/rss',
+
+            'Bitcoin Magazine' =>
+            'https://bitcoinmagazine.com/.rss/full/',
+        ],
+
+        'ai' => [
+            'OpenAI' =>
+            'https://openai.com/news/rss.xml',
+
+            'Google AI' =>
+            'https://blog.google/technology/ai/rss/',
+
+            'Hugging Face' =>
+            'https://huggingface.co/blog/feed.xml',
+        ],
+
+        'science' => [
+            'NASA' =>
+            'https://www.nasa.gov/rss/dyn/breaking_news.rss',
+        ],
+
+        'economy' => [
+            'CNBC Economy' =>
+            'https://www.cnbc.com/id/20910258/device/rss/rss.html',
+        ],
+
+    ];
+
+    protected array $warRssFeeds = [
+
+        'Reuters Conflict' =>
+        'https://www.reutersagency.com/feed/?best-topics=conflict-and-terrorism&post_type=best',
+
+        'BBC World War' =>
+        'https://feeds.bbci.co.uk/news/world/rss.xml',
+
+        'Al Jazeera War' =>
+        'https://www.aljazeera.com/xml/rss/all.xml',
+
+        'AP News World' =>
+        'https://feeds.apnews.com/rss/apf-topnews',
+
+        'DW World' =>
+        'https://rss.dw.com/rdf/rss-en-world',
+
+        'France24 World' =>
+        'https://www.france24.com/en/rss',
+
+        'The Guardian World' =>
+        'https://www.theguardian.com/world/rss',
+
+    ];
+
+    protected array $warKeywords = [
+        'war',
+        'attack',
+        'strike',
+        'missile',
+        'invasion',
+        'military',
+        'army',
+        'troops',
+        'conflict',
+        'ceasefire',
+        'nato',
+        'ukraine',
+        'russia',
+        'iran',
+        'israel',
+        'gaza',
+    ];
 
     protected array $onchainAlertSources = [
         'whale_alert_io',
@@ -16,6 +105,7 @@ class NewsService
 
     public function getNews(int $limit = 20): array
     {
+        // Ambil semua topic sekaligus - dashboard umum belum dipisah per topic
         $allNews = array_merge(
             $this->getRssNews(),
             Cache::get('telegram_news', [])
@@ -36,7 +126,7 @@ class NewsService
     public function getCryptoNewsGrouped(int $limitPerGroup = 10): array
     {
         $allNews = array_merge(
-            $this->getRssNews(),
+            $this->getRssNews('crypto'),
             Cache::get('telegram_news', [])
         );
 
@@ -57,9 +147,39 @@ class NewsService
     public function getWorldNews(int $limit = 20): array
     {
         $allNews = array_merge(
-            $this->getRssNews(),
+            $this->getRssNews('world'),
             Cache::get('telegram_world_news', [])
         );
+
+        $allNews = $this->filterNews($allNews);
+
+        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
+
+        return array_slice($allNews, 0, $limit);
+    }
+
+    public function getWarNews(int $limit = 20): array
+    {
+        $cacheKey = 'rss_news:war';
+
+        $rssNews = Cache::remember($cacheKey, now()->addMinutes(5), function () {
+            return $this->fetchRssFeeds($this->warRssFeeds, 'war');
+        });
+
+        // Filter cuma yang beneran nyinggung keyword konflik
+        $rssNews = array_values(array_filter($rssNews, function ($item) {
+            $title = mb_strtolower($item['title']);
+
+            foreach ($this->warKeywords as $keyword) {
+                if (str_contains($title, $keyword)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
+
+        $allNews = array_merge($rssNews, Cache::get('telegram_war_news', []));
 
         $allNews = $this->filterNews($allNews);
 
@@ -132,48 +252,78 @@ class NewsService
         return implode(' ', array_slice(explode(' ', $clean), 0, 10));
     }
 
-    public function getWarNews(int $limit = 20): array
+    /**
+     * Fetch RSS, di-cache per topic 5 menit biar gak nge-hit external feed
+     * tiap request. Pass $topic = null buat ambil semua topic sekaligus.
+     */
+    protected function getRssNews(?string $topic = null): array
     {
-        $allNews = array_merge(
-            $this->getRssNews(),
-            Cache::get('telegram_war_news', [])
-        );
+        $topics = $topic
+            ? [$topic => $this->rssFeeds[$topic] ?? []]
+            : $this->rssFeeds;
 
-        $allNews = $this->filterNews($allNews);
+        $allNews = [];
 
-        usort($allNews, fn($a, $b) => $b['published'] - $a['published']);
+        foreach ($topics as $topicKey => $feeds) {
+            $cacheKey = "rss_news:{$topicKey}";
 
-        return array_slice($allNews, 0, $limit);
+            $topicNews = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($feeds, $topicKey) {
+                return $this->fetchRssFeeds($feeds, $topicKey);
+            });
+
+            $allNews = array_merge($allNews, $topicNews);
+        }
+
+        return $allNews;
     }
 
-    protected function getRssNews(): array
+    /**
+     * Fetch aktual ke RSS feeds pake pool biar paralel, bukan sequential.
+     */
+    protected function fetchRssFeeds(array $feeds, string $topic): array
     {
         $allNews = [];
 
-        foreach ($this->rssFeeds as $source => $url) {
-            try {
-                $response = Http::timeout(5)->get($url);
-                if ($response->failed()) continue;
+        if (empty($feeds)) {
+            return $allNews;
+        }
 
+        $responses = Http::pool(fn ($pool) =>
+            collect($feeds)->map(fn ($url, $source) =>
+                $pool->as($source)->timeout(5)->get($url)
+            )->toArray()
+        );
+
+        foreach ($feeds as $source => $url) {
+            $response = $responses[$source] ?? null;
+
+            if (!$response || $response instanceof \Throwable || $response->failed()) {
+                Log::warning("RSS fetch failed for {$source}");
+                continue;
+            }
+
+            try {
                 $xml = simplexml_load_string($response->body());
                 if (!$xml || !isset($xml->channel->item)) continue;
 
                 foreach ($xml->channel->item as $item) {
                     $allNews[] = [
                         'source'    => $source,
+                        'topic'     => $topic,
                         'title'     => (string) $item->title,
                         'url'       => (string) $item->link,
                         'published' => strtotime((string) $item->pubDate),
                     ];
                 }
             } catch (\Exception $e) {
-                Log::warning("RSS fetch failed for {$source}: " . $e->getMessage());
+                Log::warning("RSS parse failed for {$source}: " . $e->getMessage());
                 continue;
             }
         }
 
         return $allNews;
     }
+
     public function getLiveWebcams(): array
     {
         return Cache::remember(
