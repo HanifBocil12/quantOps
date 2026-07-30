@@ -42,7 +42,7 @@ class pageContoller extends Controller
 
     public function ai()
     {
-        return view('ai.index');
+        return view('page.ai');
     }
 
     public function laporan()
