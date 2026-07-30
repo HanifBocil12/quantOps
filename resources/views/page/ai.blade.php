@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layout.app>
     <div class="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto p-4">
         <h1 class="text-xl font-semibold text-base-content mb-4">AI Assistant</h1>
 
@@ -119,4 +119,4 @@
             })();
         </script>
     @endpush
-</x-layouts.app>
+</x-layout.app>
