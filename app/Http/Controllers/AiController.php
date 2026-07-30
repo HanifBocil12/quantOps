@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use GuzzleHttp\Client;
 
 class AiController extends Controller
 {
-
     public function ask(Request $request): StreamedResponse
     {
         $request->validate([
@@ -45,14 +45,11 @@ class AiController extends Controller
             while (!$body->eof()) {
                 $buffer .= $body->read(1024);
 
-                // SSE lines are separated by \n\n
                 while (($pos = strpos($buffer, "\n\n")) !== false) {
                     $line = substr($buffer, 0, $pos);
                     $buffer = substr($buffer, $pos + 2);
 
-                    if (!str_starts_with($line, 'data: ')) {
-                        continue;
-                    }
+                    if (!str_starts_with($line, 'data: ')) continue;
 
                     $data = trim(substr($line, 6));
 
@@ -67,7 +64,6 @@ class AiController extends Controller
                     $content = $json['choices'][0]['delta']['content'] ?? null;
 
                     if ($content !== null) {
-                        // re-emit as our own SSE event to the browser
                         echo 'data: ' . json_encode(['content' => $content]) . "\n\n";
                         ob_flush();
                         flush();
