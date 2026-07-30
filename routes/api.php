@@ -3,6 +3,9 @@
 use App\Http\Controllers\BinanceController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AiController;
+
+Route::post('/ai/ask', [AiController::class, 'ask']);
 
 
 Route::prefix('binance')->group(function () {

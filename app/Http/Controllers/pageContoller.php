@@ -39,6 +39,12 @@ class pageContoller extends Controller
     {
         return view('page.model');
     }
+
+    public function ai()
+    {
+        return view('ai.index');
+    }
+
     public function laporan()
     {
         return view('page.laporan');
