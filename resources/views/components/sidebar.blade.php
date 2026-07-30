@@ -20,6 +20,7 @@
             <li><a href="{{ route('market') }}" class="">Market</a></li>
             <li><a href="{{ route('execution') }}" class="">Execution</a></li>
             <li><a href="{{ route('laporan') }}" class="">Laporan</a></li>
+            <li><a href="{{ route('ai.index') }}" class="">ai</a></li>
         </ul>
     </div>
 </div>
