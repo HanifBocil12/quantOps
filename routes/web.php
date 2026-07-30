@@ -16,7 +16,7 @@ Route::get('/execution', [pageContoller::class, 'execution'])->name('execution')
 Route::get('/laporan', [pageContoller::class, 'laporan'])->name('laporan');
 Route::get('/trade/{pair}', [pageContoller::class, 'trade'])->name('trade');
 Route::get('/privacy-policy', [pageContoller::class, 'privacy'])->name('privacy.policy');
-Route::get('/ai', [pageContoller::class, 'ai'])->name('ai');
+Route::get('/ai', [pageContoller::class, 'ai'])->name('ai.index');
 
 Route::get('/cron/run-schedule', function () {
     if (request()->query('secret') !== config('services.cron.cron_secret')) {
